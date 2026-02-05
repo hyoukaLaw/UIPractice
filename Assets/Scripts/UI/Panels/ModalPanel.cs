@@ -12,17 +12,19 @@ namespace UIModule.Panels
         private string _message;
         private System.Action _onConfirm;
         private System.Action _onCancel;
+        private ModalPanelModel _model;
 
         public ModalPanel(IModalView modalView, BasePanelModel model)
         {
             PanelType = UIPanelType.ModalConfirm;
             IsModal = true;
             _modalView = modalView;
-            ParseArgs(model.Args);
+            _model = (ModalPanelModel)model;
         }
 
         public override void OnEnter(params object[] args)
         {
+            ParseArgs(args);
             Log.LogInfo($"ModalPanel OnEnter: Title={_title}");
             if (_modalView != null)
             {

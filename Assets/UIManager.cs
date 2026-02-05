@@ -30,15 +30,13 @@ namespace UIModule.Core
             }
             var config = UIPanelConfigRegistry.GetConfig(type);
             var monoPanel = UIPanelFactory.Create(type);
-            var panelModel = UIPanelModelFactory.Create(type, args);
+            var panelModel = UIPanelModelFactory.Create(type);
             var panel = UIPresenterFactory.Create(type, monoPanel, panelModel);
             var panelData = new UIPanelData(type, panel.IsModal);
-            
             if (config?.IsModal == true)
             {
                 UICanvasManager.Instance?.ShowModalBackground();
             }
-            
             _stack.Push(panelData);
             _activePanels.Add(type, panel);
             _activeMonoPanels.Add(type, monoPanel);

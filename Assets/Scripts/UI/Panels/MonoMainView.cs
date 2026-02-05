@@ -11,8 +11,11 @@ namespace UIModule.Panels
     public class MonoMainView : MonoPanel, IMainView
     {
         public event Action OnCharacterClick;
+        public event Action OnBagClick;
         [SerializeField]
         private Button _characterPanelButton;
+        [SerializeField]
+        private Button _bagPanelButton;
 
         private void OnEnable()
         {

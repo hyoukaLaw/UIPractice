@@ -17,11 +17,12 @@ namespace UIModule.Panels
             PanelType = UIPanelType.ModalAlert;
             IsModal = true;
             _alertView = alertView;
-            ParseArgs(model.Args);
+            
         }
 
         public override void OnEnter(params object[] args)
         {
+            ParseArgs(args);
             Log.LogInfo($"AlertPanel OnEnter: Title={_title}");
             
             if (_alertView != null)
