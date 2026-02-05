@@ -235,7 +235,7 @@ GameObject:
   - component: {fileID: 595375820}
   - component: {fileID: 595375819}
   m_Layer: 0
-  m_Name: UICanvasNabager
+  m_Name: UICanvasManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
