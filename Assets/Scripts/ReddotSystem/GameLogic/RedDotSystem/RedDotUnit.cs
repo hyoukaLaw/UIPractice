@@ -37,6 +37,9 @@ public enum RedDotUnit
     WEARABLE_EQUIP_NUM,                     // 可穿戴装备数
     UPGRADEABLE_EQUIP_NUM,                  // 可升级装备数
     #endregion
+    #region 人物部分
+    CHARACTER_NEW,
+    #endregion
 }
 
 /// <summary>

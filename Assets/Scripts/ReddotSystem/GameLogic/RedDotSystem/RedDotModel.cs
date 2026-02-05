@@ -102,6 +102,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         AddRedDotUnitInfo(RedDotUnit.BATTLE_MAIL_REWARD_NUM, "战斗邮件可领奖数", RedDotUtilities.CaculateNewBattleMailRewardNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.WEARABLE_EQUIP_NUM, "可穿戴装备数", RedDotUtilities.CaculateWearableEquipNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.UPGRADEABLE_EQUIP_NUM, "可升级装备数", RedDotUtilities.CaculateUpgradeableEquipNum, RedDotType.NUMBER);
+        AddRedDotUnitInfo(RedDotUnit.CHARACTER_NEW, "新人物", RedDotUtilities.CalculateCharacterNew, RedDotType.NEW);
     }
 
     /// <summary>
@@ -149,6 +150,9 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         redDotInfo = AddRedDotInfo(RedDotNames.MAIN_UI_MENU_BACKPACK, "主界面菜单背包红点");
         redDotInfo.AddRedDotUnit(RedDotUnit.NEW_ITEM_NUM);
         redDotInfo.AddRedDotUnit(RedDotUnit.NEW_RESOURCE_NUM);
+
+        redDotInfo = AddRedDotInfo(RedDotNames.MAIN_UI_CHARACTER, "主界面人物红点");
+        redDotInfo.AddRedDotUnit(RedDotUnit.CHARACTER_NEW);
     }
 
     /// <summary>

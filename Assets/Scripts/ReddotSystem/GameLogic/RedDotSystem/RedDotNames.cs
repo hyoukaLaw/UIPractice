@@ -47,6 +47,10 @@ public static class RedDotNames
     /// 主界面菜单背包红点
     /// </summary>
     public const string MAIN_UI_MENU_BACKPACK = "MAIN_UI_MENU|BACKPACK";
+    /// <summary>
+    /// 主界面人物按钮红点
+    /// </summary>
+    public const string MAIN_UI_CHARACTER = "MAIN_UI_CHARACTER";
     #endregion
 
     #region 背包界面红点部分
@@ -93,9 +97,5 @@ public static class RedDotNames
     /// 装备界面可升级红点
     /// </summary>
     public const string EQUIP_UI_UPGRADABLE = "MAIN_UI_MENU|EQUIP|UPGRADABLE";
-    #endregion
-    
-    #region 人物界面红点部分
-    public const string CHARACTER_UI_STORY = "MAIN_UI_MENU|CHARACTER|STORY";
     #endregion
 }

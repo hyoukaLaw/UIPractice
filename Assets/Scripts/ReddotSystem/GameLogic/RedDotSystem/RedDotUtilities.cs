@@ -6,6 +6,10 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using UIModule.Core;
+using UIModule.Core.UISystem;
+using UIModule.Data;
+using UIModule.Data.Models;
 using UnityEngine;
 
 /// <summary>
@@ -159,5 +163,12 @@ public static class RedDotUtilities
         return GameModel.Singleton.UpgradeableEquipNum;
     }
     #endregion
+
+    public static int CalculateCharacterNew()
+    {
+        return InitialData.CharacterNew ? 1 : 0;
+    }
+    
+    
     #endregion
 }

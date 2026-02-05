@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UIModule.Data.Models;
 
 namespace UIModule.Core
 {
@@ -16,6 +17,7 @@ namespace UIModule.Core
 
         private readonly Dictionary<UIPanelType, BaseUIPanel> _activePanels = new Dictionary<UIPanelType, BaseUIPanel>();
         private readonly Dictionary<UIPanelType, MonoPanel> _activeMonoPanels = new Dictionary<UIPanelType, MonoPanel>();
+        private readonly Dictionary<UIPanelType, BasePanelModel> _activePanelModels = new Dictionary<UIPanelType, BasePanelModel>();
 
         private UIManager()
         {
@@ -134,6 +136,13 @@ namespace UIModule.Core
             {
                 _stack.Push(tempStack.Pop());
             }
+        }
+        
+        public BasePanelModel FindPanelModel(UIPanelType type)
+        {
+            if (_activePanelModels.TryGetValue(type, out var model))
+                return model;
+            return null;
         }
     }
 }
