@@ -18,6 +18,10 @@ namespace UIModule.Adapters
                     return view is ICharacterStoryView characterStoryView ? new CharacterStoryPanel(characterStoryView) : null;
                 case UIPanelType.Main:
                     return view is IMainView mainView ? new MainPanel(mainView) : null;
+                case UIPanelType.ModalConfirm:
+                    return view is IModalView modalViewConfirm ? new ModalPanel(modalViewConfirm, model) : null;
+                case UIPanelType.ModalAlert:
+                    return view is IModalView modalViewAlert ? new AlertPanel(modalViewAlert, model) : null;
                 default:
                     return null;
             }

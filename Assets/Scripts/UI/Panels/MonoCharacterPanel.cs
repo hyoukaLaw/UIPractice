@@ -24,6 +24,9 @@ namespace UIModule.Panels
 
         [SerializeField]
         private Button _storyPanelButton;
+        
+        [SerializeField]
+        private Button _cgPanelButton;
 
         [SerializeField] 
         private GameObject _characterListContent;
@@ -33,12 +36,14 @@ namespace UIModule.Panels
         {
             _closeButton.onClick.AddListener(OnCloseButtonClick);
             _storyPanelButton.onClick.AddListener(OnStoryButtonClick);
+            _cgPanelButton.onClick.AddListener(OnCgButtonClick);
         }
         
         private void OnDisable()
         {
             _closeButton.onClick.RemoveListener(OnCloseButtonClick);
             _storyPanelButton.onClick.RemoveListener(OnStoryButtonClick);
+            _cgPanelButton.onClick.RemoveListener(OnCgButtonClick);
         }
 
         public void SetCharacterName(string characterName)
@@ -76,6 +81,7 @@ namespace UIModule.Panels
 
         public event Action OnCloseClick;
         public event Action OnStoryPanelClick;
+        public event Action OnCgPanelClick;
         
         public void OnCloseButtonClick()
         {
@@ -86,11 +92,10 @@ namespace UIModule.Panels
         {
             OnStoryPanelClick?.Invoke();
         }
-
-        public class CharacterListItemUI
+        
+        public void OnCgButtonClick()
         {
-            public Image CharacterAvatar;
-            public int Index;
+            OnCgPanelClick?.Invoke();
         }
     }
 }

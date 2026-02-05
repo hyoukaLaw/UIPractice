@@ -28,10 +28,17 @@ namespace UIModule.Core
                 Log.LogWarning($"Panel {type} is already active");
                 return;
             }
+            var config = UIPanelConfigRegistry.GetConfig(type);
             var monoPanel = UIPanelFactory.Create(type);
             var panelModel = UIPanelModelFactory.Create(type, args);
             var panel = UIPresenterFactory.Create(type, monoPanel, panelModel);
             var panelData = new UIPanelData(type, panel.IsModal);
+            
+            if (config?.IsModal == true)
+            {
+                UICanvasManager.Instance?.ShowModalBackground();
+            }
+            
             _stack.Push(panelData);
             _activePanels.Add(type, panel);
             _activeMonoPanels.Add(type, monoPanel);
@@ -51,6 +58,9 @@ namespace UIModule.Core
                 Log.LogError($"Panel {type} does not have a MonoPanel component");
                 return;
             }
+            
+            var config = UIPanelConfigRegistry.GetConfig(type);
+            
             panel.OnExit();
             var panelData = FindPanelInStack(type);
             if (panelData != null)
@@ -60,6 +70,11 @@ namespace UIModule.Core
             _activePanels.Remove(type);
             _activeMonoPanels.Remove(type);
             UIAssetLoader.Destroy(monoPanel.gameObject);
+            
+            if (config?.IsModal == true)
+            {
+                UICanvasManager.Instance?.HideModalBackground();
+            }
         }
 
         public void HideTopPanel()

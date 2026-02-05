@@ -15,5 +15,6 @@ namespace UIModule.Interfaces
         void HideView();
         event Action OnCloseClick;
         event Action OnStoryPanelClick;
+        event Action OnCgPanelClick;
     }
 }

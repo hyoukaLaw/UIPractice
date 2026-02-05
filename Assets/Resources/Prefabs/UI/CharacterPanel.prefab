@@ -2797,6 +2797,7 @@ MonoBehaviour:
   _characterNameText: {fileID: 4903990925775747982}
   _levelText: {fileID: 9141305856134003729}
   _storyPanelButton: {fileID: 3755080655561293524}
+  _cgPanelButton: {fileID: 7679681839719093529}
   _characterListContent: {fileID: 3625892161046069992}
 --- !u!1 &8394331076505873179
 GameObject:

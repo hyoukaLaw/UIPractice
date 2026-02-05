@@ -43,6 +43,7 @@ namespace UIModule.Panels
                 characterListItems.Add(gameObjectItem);
             }
             _characterView.SetCharacterList(characterListItems);
+            SelectCharacter(0);
             RegisterCallback();
         }
 
@@ -66,12 +67,14 @@ namespace UIModule.Panels
         {
             _characterView.OnCloseClick += CloseCurrent;
             _characterView.OnStoryPanelClick += OpenStory;
+            _characterView.OnCgPanelClick += OpenConfirm;
         }
         
         public void UnregisterCallback()
         {
             _characterView.OnCloseClick -= CloseCurrent;
             _characterView.OnStoryPanelClick -= OpenStory;
+            _characterView.OnCgPanelClick -= OpenConfirm;
             foreach (var item in _characterListItemUIs)
             {
                 item.OnClickEvent -= SelectCharacter;
@@ -88,12 +91,20 @@ namespace UIModule.Panels
             UIManager.Instance.ShowPanel(UIPanelType.CharacterStory);
         }
 
+        private void OpenConfirm()
+        {
+            UIManager.Instance.ShowPanel(UIPanelType.ModalConfirm);
+        }
+
         private void SelectCharacter(int index)
         {
             foreach (var item in _characterListItemUIs)
             {
                 item.SetSelected(index == item.GetIndex());
             }
+            var character = _model.GetCharacterConfig().GetCharacters()[index];
+            _characterView.SetCharacterName(character.GetName());
+            _characterView.SetLevel(character.GetLevel());
         }
     }
 }

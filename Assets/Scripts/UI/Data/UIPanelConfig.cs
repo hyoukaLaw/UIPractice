@@ -44,6 +44,22 @@ namespace UIModule.Data
                 Layer = UILayer.Normal,
                 IsModal = false
             });
+
+            Register(new UIPanelConfig
+            {
+                Type = UIPanelType.ModalConfirm,
+                PrefabPath = "Prefabs/UI/ModalConfirm",
+                Layer = UILayer.Modal,
+                IsModal = true
+            });
+
+            Register(new UIPanelConfig
+            {
+                Type = UIPanelType.ModalAlert,
+                PrefabPath = "Prefabs/UI/ModalAlert",
+                Layer = UILayer.Modal,
+                IsModal = true
+            });
         }
 
         public static void Register(UIPanelConfig config)

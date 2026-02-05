@@ -6,6 +6,7 @@ namespace UIModule.Data.Models
     {
         public UIPanelType PanelType { get; set; }
         public int InstanceId { get; set; }
+        public object[] Args { get; set; }
 
         protected BasePanelModel()
         {
