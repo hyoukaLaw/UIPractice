@@ -22,6 +22,8 @@ namespace UIModule.Adapters
                     return view is IModalView modalViewConfirm ? new ModalPanel(modalViewConfirm, model) : null;
                 case UIPanelType.ModalAlert:
                     return view is IModalView modalViewAlert ? new AlertPanel(modalViewAlert, model) : null;
+                case UIPanelType.Bag:
+                    return view is IBagView bagView ? new BagPanel(bagView, model) : null;
                 default:
                     return null;
             }

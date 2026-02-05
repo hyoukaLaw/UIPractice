@@ -18,12 +18,14 @@ namespace UIModule.Panels
         {
             Log.LogInfo($"MainPanel OnEnter");
             _view.OnCharacterClick += OpenCharacterPanel;
+            _view.OnBagClick += OpenBagPanel;
         }
 
         public override void OnExit()
         {
             Log.LogInfo($"MainPanel OnExit");
             _view.OnCharacterClick -= OpenCharacterPanel;
+            _view.OnBagClick -= OpenBagPanel;
         }
 
         public override void OnPause()
@@ -39,6 +41,11 @@ namespace UIModule.Panels
         private void OpenCharacterPanel()
         {
             UIManager.Instance.ShowPanel(UIPanelType.Character);
+        }
+        
+        private void OpenBagPanel()
+        {
+            UIManager.Instance.ShowPanel(UIPanelType.Bag);
         }
     }
 }

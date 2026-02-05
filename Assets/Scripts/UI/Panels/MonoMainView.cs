@@ -20,16 +20,23 @@ namespace UIModule.Panels
         private void OnEnable()
         {
             _characterPanelButton.onClick.AddListener(OnCharacterButtonClick);
+            _bagPanelButton.onClick.AddListener(OnBagButtonClick);
         }
 
         private void OnDisable()
         {
             _characterPanelButton.onClick.RemoveListener(OnCharacterButtonClick);
+            _bagPanelButton.onClick.RemoveListener(OnBagButtonClick);
         }
 
         private void OnCharacterButtonClick()
         {
             OnCharacterClick?.Invoke();
+        }
+        
+        private void OnBagButtonClick()
+        {
+            OnBagClick?.Invoke();
         }
     }
 }

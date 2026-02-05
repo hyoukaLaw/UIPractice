@@ -10,7 +10,7 @@ namespace UIModule.Data
         Character,
         CharacterStory,
         Settings,
-        Inventory,
+        Bag,
         Shop,
         Battle,
         ModalConfirm,

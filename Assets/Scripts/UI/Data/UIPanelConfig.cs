@@ -60,6 +60,14 @@ namespace UIModule.Data
                 Layer = UILayer.Modal,
                 IsModal = true
             });
+
+            Register(new UIPanelConfig
+            {
+                Type = UIPanelType.Bag,
+                PrefabPath = "Prefabs/UI/BagPanel",
+                Layer = UILayer.Normal,
+                IsModal = false
+            });
         }
 
         public static void Register(UIPanelConfig config)

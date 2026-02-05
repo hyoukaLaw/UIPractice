@@ -21,6 +21,9 @@ namespace UIModule.Adapters
                 case UIPanelType.ModalAlert:
                     model = new AlertPanelModel();
                     return model;
+                case UIPanelType.Bag:
+                    model = new BagPanelModel();
+                    return model;
                 default:
                     Log.LogWarning($"No model defined for panel type: {type}");
                     return null;
