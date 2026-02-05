@@ -94,4 +94,8 @@ public static class RedDotNames
     /// </summary>
     public const string EQUIP_UI_UPGRADABLE = "MAIN_UI_MENU|EQUIP|UPGRADABLE";
     #endregion
+    
+    #region 人物界面红点部分
+    public const string CHARACTER_UI_STORY = "MAIN_UI_MENU|CHARACTER|STORY";
+    #endregion
 }
