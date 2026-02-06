@@ -7,6 +7,7 @@ namespace UIModule.Interfaces
     {
         void SetData(SerializableCharacterData data, int index);
         void SetSelected(bool selected);
+        void SetRedDot(bool show);
         event Action<int> OnClickEvent;
         int GetIndex();
     }

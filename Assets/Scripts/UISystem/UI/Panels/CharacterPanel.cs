@@ -41,6 +41,8 @@ namespace UIModule.Panels
                 characterListItem.SetData(item, index++);
                 _characterListItemUIs.Add(characterListItem);
                 characterListItems.Add(gameObjectItem);
+                string redDotName = string.Format(RedDotNames.CHARACTER_STORY_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotName(redDotName, RefreshCharacterStoryRedDot);
             }
             _characterView.SetCharacterList(characterListItems);
             SelectCharacter(0);
@@ -78,6 +80,13 @@ namespace UIModule.Panels
             foreach (var item in _characterListItemUIs)
             {
                 item.OnClickEvent -= SelectCharacter;
+
+            }
+
+            foreach (var item in _model.GetCharacterConfig().GetCharacters())
+            {
+                string redDotName = string.Format(RedDotNames.CHARACTER_STORY_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.UnbindRedDotName(redDotName, RefreshCharacterStoryRedDot);
             }
         }
 
@@ -105,6 +114,38 @@ namespace UIModule.Panels
             var character = _model.GetCharacterConfig().GetCharacters()[index];
             _characterView.SetCharacterName(character.GetName());
             _characterView.SetLevel(character.GetLevel());
+        }
+
+        private void RefreshCharacterStoryRedDot(string redDotName, int result, RedDotType redDotType)
+        {
+            int characterId;
+            if (!TryParseRedDotNameId(redDotName, out characterId))
+            {
+                return;
+            }
+            foreach (var item in _characterListItemUIs)
+            {
+                if (item.GetIndex() == characterId)
+                {
+                    item.SetRedDot(result > 0);
+                }
+            }
+        }
+        
+        
+        private bool TryParseRedDotNameId(string redDotName, out int id)
+        {
+            id = 0;
+            if (string.IsNullOrEmpty(redDotName))
+            {
+                return false;
+            }
+            var parts = redDotName.Split('|');
+            if (parts.Length < 2)
+            {
+                return false;
+            }
+            return int.TryParse(parts[parts.Length - 1], out id);
         }
     }
 }

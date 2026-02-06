@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UIModule.Data.Models;
 using UIModule.Interfaces;
 using UnityEngine;
@@ -16,6 +17,9 @@ namespace UIModule.Panels
 
         [SerializeField]
         private Button _button;
+        
+        [SerializeField]
+        private RedDotWidget _redDotWidget;
 
         private int _index;
 
@@ -48,6 +52,11 @@ namespace UIModule.Panels
             {
                 _selectedBackground.SetActive(selected);
             }
+        }
+
+        public void SetRedDot(bool show)
+        {
+            _redDotWidget.gameObject.SetActive(show);
         }
 
         public event Action<int> OnClickEvent;

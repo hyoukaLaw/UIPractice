@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Description:             RedDotModel.cs
  * Author:                  TONYTANG
  * Create Date:             2022/08/14
@@ -35,9 +35,8 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
     /// </summary>
     private Dictionary<RedDotUnit, List<string>> mRedDotUnitNameMap;
 
-    /// <summary>
-    /// 红点前缀树
-    /// </summary>
+    private Dictionary<string, int> mRedDotNameResultMap;
+
     public Trie RedDotTrie
     {
         get;
@@ -62,6 +61,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         mRedDotUnitResultMap = new Dictionary<RedDotUnit, int>();
         mRedDotInfoMap = new Dictionary<string, RedDotInfo>();
         mRedDotUnitNameMap = new Dictionary<RedDotUnit, List<string>>();
+        mRedDotNameResultMap = new Dictionary<string, int>();
         IsInitCompelte = false;
     }
 
@@ -89,7 +89,6 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
     /// </summary>
     private void InitRedDotUnitInfo()
     {
-        // 构建添加所有游戏里的红点运算单元信息
         AddRedDotUnitInfo(RedDotUnit.NEW_FUNC1, "动态新功能1解锁", RedDotUtilities.CaculateNewFunc1, RedDotType.NEW);
         AddRedDotUnitInfo(RedDotUnit.NEW_FUNC2, "动态新功能2解锁", RedDotUtilities.CaculateNewFunc2, RedDotType.NEW);
         AddRedDotUnitInfo(RedDotUnit.NEW_ITEM_NUM, "新道具数", RedDotUtilities.CaculateNewItemNum, RedDotType.NUMBER);
@@ -103,6 +102,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         AddRedDotUnitInfo(RedDotUnit.WEARABLE_EQUIP_NUM, "可穿戴装备数", RedDotUtilities.CaculateWearableEquipNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.UPGRADEABLE_EQUIP_NUM, "可升级装备数", RedDotUtilities.CaculateUpgradeableEquipNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.CHARACTER_NEW, "新人物", RedDotUtilities.CalculateCharacterNew, RedDotType.NEW);
+        AddRedDotUnitInfoWithId(RedDotUnit.CHARACTER_STORY_NEW, "新人物故事", RedDotUtilities.CalculateCharacterStoryNew, RedDotType.NEW);
     }
 
     /// <summary>
@@ -201,13 +201,15 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         redDotInfo = AddRedDotInfo(RedDotNames.EQUIP_UI_UPGRADABLE, "装备界面可升级红点");
         redDotInfo.AddRedDotUnit(RedDotUnit.UPGRADEABLE_EQUIP_NUM);
     }
+    
+    
 
     /// <summary>
     /// 添加红点信息
     /// </summary>
     /// <param name="redDotName"></param>
     /// <param name="redDotDes"></param>
-    private RedDotInfo AddRedDotInfo(string redDotName, string redDotDes)
+    public RedDotInfo AddRedDotInfo(string redDotName, string redDotDes)
     {
         if (mRedDotInfoMap.ContainsKey(redDotName))
         {
@@ -262,6 +264,19 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
     /// <param name="redDotType"></param>
     /// <returns></returns>
     private RedDotUnitInfo AddRedDotUnitInfo(RedDotUnit redDotUnit, string redDotUnitDes, Func<int> caculateFunc, RedDotType redDotType = RedDotType.NUMBER)
+    {
+        RedDotUnitInfo redDotUnitInfo;
+        if(mRedDotUnitInfoMap.TryGetValue(redDotUnit, out redDotUnitInfo))
+        {
+            Debug.LogError($"已添加红点运算单元:{redDotUnit.ToString()}的红点运算单元信息,请勿重复添加,添加失败!");
+            return redDotUnitInfo;
+        }
+        redDotUnitInfo = new RedDotUnitInfo(redDotUnit, redDotUnitDes, caculateFunc, redDotType);
+        mRedDotUnitInfoMap.Add(redDotUnit, redDotUnitInfo);
+        return redDotUnitInfo;
+    }
+
+    private RedDotUnitInfo AddRedDotUnitInfoWithId(RedDotUnit redDotUnit, string redDotUnitDes, Func<int, int> caculateFunc, RedDotType redDotType = RedDotType.NUMBER)
     {
         RedDotUnitInfo redDotUnitInfo;
         if(mRedDotUnitInfoMap.TryGetValue(redDotUnit, out redDotUnitInfo))
@@ -403,6 +418,76 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
             return true;
         }
         mRedDotUnitResultMap[redDotUnit] = result;
+        return true;
+    }
+
+    public RedDotInfo RegisterDynamicRedDot(string redDotName, string redDotDes, RedDotUnit redDotUnit)
+    {
+        if (mRedDotInfoMap.ContainsKey(redDotName))
+        {
+            Debug.LogWarning($"红点名:{redDotName}已存在，跳过注册!");
+            return mRedDotInfoMap[redDotName];
+        }
+        var redDotInfo = new RedDotInfo(redDotName, redDotDes);
+        redDotInfo.AddRedDotUnit(redDotUnit);
+        mRedDotInfoMap.Add(redDotName, redDotInfo);
+        RedDotTrie.AddWord(redDotName);
+        if (!mRedDotUnitNameMap.ContainsKey(redDotUnit))
+        {
+            mRedDotUnitNameMap.Add(redDotUnit, new List<string>());
+        }
+        mRedDotUnitNameMap[redDotUnit].Add(redDotName);
+        return redDotInfo;
+    }
+
+    public void UnregisterDynamicRedDot(string redDotName)
+    {
+        if (!mRedDotInfoMap.ContainsKey(redDotName))
+        {
+            Debug.LogWarning($"红点名:{redDotName}不存在，跳过注销!");
+            return;
+        }
+        var redDotInfo = mRedDotInfoMap[redDotName];
+        foreach (var redDotUnit in redDotInfo.RedDotUnitList)
+        {
+            if (mRedDotUnitNameMap.ContainsKey(redDotUnit))
+            {
+                mRedDotUnitNameMap[redDotUnit].Remove(redDotName);
+            }
+        }
+        mRedDotNameResultMap.Remove(redDotName);
+        RedDotTrie.RemoveWord(redDotName);
+        mRedDotInfoMap.Remove(redDotName);
+    }
+
+    public int GetRedDotNameResult(string redDotName)
+    {
+        int result;
+        if (mRedDotNameResultMap.TryGetValue(redDotName, out result))
+        {
+            return result;
+        }
+        var redDotUnitList = GetRedDotUnitsByName(redDotName);
+        if (redDotUnitList == null)
+        {
+            return 0;
+        }
+        result = 0;
+        foreach (var redDotUnit in redDotUnitList)
+        {
+            result += GetRedDotUnitResult(redDotUnit);
+        }
+        return result;
+    }
+
+    public bool SetRedDotNameResult(string redDotName, int result)
+    {
+        if (!mRedDotNameResultMap.ContainsKey(redDotName))
+        {
+            mRedDotNameResultMap.Add(redDotName, result);
+            return true;
+        }
+        mRedDotNameResultMap[redDotName] = result;
         return true;
     }
 }

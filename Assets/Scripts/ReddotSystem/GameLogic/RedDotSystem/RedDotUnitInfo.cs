@@ -51,9 +51,18 @@ public class RedDotUnitInfo
         private set;
     }
 
-    /// <summary>
-    /// 构造函数
-    /// </summary>
+    public bool SupportIdParameter
+    {
+        get;
+        private set;
+    }
+
+    public Func<int, int> RedDotUnitCalculateFuncWithId
+    {
+        get;
+        private set;
+    }
+
     private RedDotUnitInfo()
     {
 
@@ -72,5 +81,15 @@ public class RedDotUnitInfo
         RedDotUnitDes = redDotUnitDes;
         RedDotUnitCalculateFunc = redDotUnitCalculateFunc;
         RedDotType = redDotType;
+        SupportIdParameter = false;
+    }
+
+    public RedDotUnitInfo(RedDotUnit redDotUnit, string redDotUnitDes, Func<int, int> redDotUnitCalculateFunc, RedDotType redDotType)
+    {
+        RedDotUnit = redDotUnit;
+        RedDotUnitDes = redDotUnitDes;
+        RedDotUnitCalculateFuncWithId = redDotUnitCalculateFunc;
+        RedDotType = redDotType;
+        SupportIdParameter = true;
     }
 }

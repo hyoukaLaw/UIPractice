@@ -61,6 +61,7 @@ namespace UIModule.Panels
             foreach (var characterListItem in characterListItems)
             {
                 characterListItem.transform.SetParent(_characterListContent.transform, false);
+                
             }
 
         }

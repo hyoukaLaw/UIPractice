@@ -39,6 +39,7 @@ public enum RedDotUnit
     #endregion
     #region 人物部分
     CHARACTER_NEW,
+    CHARACTER_STORY_NEW
     #endregion
 }
 

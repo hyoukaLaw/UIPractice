@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Description:             RedDotUtilities.cs
  * Author:                  TONYTANG
  * Create Date:             2022/08/14
@@ -164,10 +164,18 @@ public static class RedDotUtilities
     }
     #endregion
 
+    #region 人物相关
     public static int CalculateCharacterNew()
     {
         return InitialData.CharacterNew ? 1 : 0;
     }
+
+    public static int CalculateCharacterStoryNew(int characterId)
+    {
+        return 1;
+    }
+    
+    #endregion
     
     
     #endregion

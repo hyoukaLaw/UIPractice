@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Description:             RedDotNames.cs
  * Author:                  TONYTANG
  * Create Date:             2022/08/14
@@ -97,5 +97,11 @@ public static class RedDotNames
     /// 装备界面可升级红点
     /// </summary>
     public const string EQUIP_UI_UPGRADABLE = "MAIN_UI_MENU|EQUIP|UPGRADABLE";
+    #endregion
+
+    #region ID-based红点模板
+    public const string CHARACTER_STORY_TEMPLATE = "CHARACTER|STORY|{0}";
+    public const string EQUIPMENT_UPGRADEABLE_TEMPLATE = "EQUIPMENT|UPGRADEABLE|{0}";
+    public const string MAIL_REWARD_TEMPLATE = "MAIL|REWARD|{0}";
     #endregion
 }
