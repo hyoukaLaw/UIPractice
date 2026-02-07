@@ -24,22 +24,9 @@ namespace UIModule.Panels
         public override void OnEnter(params object[] args)
         {
             Log.LogInfo($"CharacterPanel OnEnter");
-            
-            CharacterConfig characterConfig = Resources.Load<CharacterConfig>($"Config/CharacterConfig");
-            _model.SetCharacterConfig(characterConfig);
-            
-            int index = 0;
-            List<GameObject> characterListItems = new();
-            GameObject gameObjectItemPrefab = Resources.Load<GameObject>("Prefabs/UI/CharacterListItem");
-            foreach (var item in characterConfig.GetCharacters())
-            { 
-                GameObject gameObjectItem = Object.Instantiate(gameObjectItemPrefab);
-                ICharacterListItem characterListItem = gameObjectItem.GetComponent<ICharacterListItem>();
-                characterListItem.SetData(item, index++);
-                _characterListItemUIs.Add(characterListItem);
-                characterListItems.Add(gameObjectItem);
-            }
-            _characterView.SetCharacterList(characterListItems);
+            LoadCharacterConfig();
+            var characterListItems = BuildCharacterListItems();
+            InitializeCharacterView(characterListItems);
             SelectCharacter(0);
             RegisterCallback();
             MarkAllCharacterRedDotDirty();
@@ -63,47 +50,100 @@ namespace UIModule.Panels
 
         public void RegisterCallback()
         {
-            foreach (var item in _characterListItemUIs)
-            {
-                item.OnClickEvent += SelectCharacter;
-            }
-            foreach (var item in _model.GetCharacterConfig().GetCharacters())
-            {
-                string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotName, RefreshCharacterRedDot);
-
-                string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameStory, RefreshCharacterStoryRedDot);
-                 
-                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameCg, RefreshCharacterCgRedDot);
-            }
-            _characterView.OnCloseClick += CloseCurrent;
-            _characterView.OnStoryPanelClick += OpenStory;
-            _characterView.OnCgPanelClick += OpenConfirm;
+            BindListItemClickEvents();
+            BindCharacterRedDotCallbacks();
+            BindPanelButtonCallbacks();
         }
         
         public void UnregisterCallback()
         {
-            _characterView.OnCloseClick -= CloseCurrent;
-            _characterView.OnStoryPanelClick -= OpenStory;
-            _characterView.OnCgPanelClick -= OpenConfirm;
+            UnbindPanelButtonCallbacks();
+            UnbindListItemClickEvents();
+            UnbindCharacterRedDotCallbacks();
+        }
+
+        private void LoadCharacterConfig()
+        {
+            var characterConfig = Resources.Load<CharacterConfig>($"Config/CharacterConfig");
+            _model.SetCharacterConfig(characterConfig);
+        }
+
+        private List<GameObject> BuildCharacterListItems()
+        {
+            var characterConfig = _model.GetCharacterConfig();
+            var characterListItems = new List<GameObject>();
+            var gameObjectItemPrefab = Resources.Load<GameObject>("Prefabs/UI/CharacterListItem");
+            var index = 0;
+            foreach (var item in characterConfig.GetCharacters())
+            {
+                var gameObjectItem = Object.Instantiate(gameObjectItemPrefab);
+                var characterListItem = gameObjectItem.GetComponent<ICharacterListItem>();
+                characterListItem.SetData(item, index++);
+                _characterListItemUIs.Add(characterListItem);
+                characterListItems.Add(gameObjectItem);
+            }
+            return characterListItems;
+        }
+
+        private void InitializeCharacterView(List<GameObject> characterListItems)
+        {
+            _characterView.SetCharacterList(characterListItems);
+        }
+
+        private void BindListItemClickEvents()
+        {
+            foreach (var item in _characterListItemUIs)
+            {
+                item.OnClickEvent += SelectCharacter;
+            }
+        }
+
+        private void UnbindListItemClickEvents()
+        {
             foreach (var item in _characterListItemUIs)
             {
                 item.OnClickEvent -= SelectCharacter;
             }
+        }
 
+        private void BindCharacterRedDotCallbacks()
+        {
+            foreach (var item in _model.GetCharacterConfig().GetCharacters())
+            {
+                string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotName, RefreshCharacterRedDot);
+                string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameStory, RefreshCharacterStoryRedDot);
+                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameCg, RefreshCharacterCgRedDot);
+            }
+        }
+
+        private void UnbindCharacterRedDotCallbacks()
+        {
             foreach (var item in _model.GetCharacterConfig().GetCharacters())
             {
                 string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.UnbindRedDotName(redDotName, RefreshCharacterRedDot);
-                
                 string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.UnbindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
-
                 string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.UnbindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
             }
+        }
+
+        private void BindPanelButtonCallbacks()
+        {
+            _characterView.OnCloseClick += CloseCurrent;
+            _characterView.OnStoryPanelClick += OpenStory;
+            _characterView.OnCgPanelClick += OpenConfirm;
+        }
+
+        private void UnbindPanelButtonCallbacks()
+        {
+            _characterView.OnCloseClick -= CloseCurrent;
+            _characterView.OnStoryPanelClick -= OpenStory;
+            _characterView.OnCgPanelClick -= OpenConfirm;
         }
 
         private void MarkAllCharacterRedDotDirty()
