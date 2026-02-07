@@ -25,6 +25,11 @@ namespace UIModule.Core
 
         public void ShowPanel(UIPanelType type, params object[] args)
         {
+            if (_stack.Peek() != null)
+            {
+                _activePanels[_stack.Peek().PanelType].OnPause();
+            }
+            
             if (_activePanels.ContainsKey(type))
             {
                 Log.LogWarning($"Panel {type} is already active");
@@ -74,6 +79,11 @@ namespace UIModule.Core
             if (config?.IsModal == true)
             {
                 UICanvasManager.Instance?.HideModalBackground();
+            }
+
+            if (_stack.Count > 0)
+            {
+                _activePanels[_stack.Peek().PanelType].OnResume();
             }
         }
 

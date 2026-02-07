@@ -167,12 +167,22 @@ public static class RedDotUtilities
     #region 人物相关
     public static int CalculateCharacterNew()
     {
-        return InitialData.CharacterNew ? 1 : 0;
+        int result = 0;
+        foreach (var data in InitialData.Singleton.CharacterConfig.GetCharacters())
+        {
+            if (data.GetIsNewCharacter())
+            {
+                result++;
+                break;
+            }
+        }
+        return result;
     }
 
     public static int CalculateCharacterStoryNew(int characterId)
     {
-        return 1;
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        return characterData.GetIsNewCharacter() ? 1 : 0;
     }
     
     #endregion

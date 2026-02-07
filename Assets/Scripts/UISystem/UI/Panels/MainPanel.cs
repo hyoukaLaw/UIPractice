@@ -36,6 +36,7 @@ namespace UIModule.Panels
         public override void OnResume()
         {
             Log.LogInfo($"MainPanel OnResume");
+            RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_NEW);
         }
 
         private void OpenCharacterPanel()

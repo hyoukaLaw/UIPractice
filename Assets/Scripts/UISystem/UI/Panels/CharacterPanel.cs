@@ -114,6 +114,7 @@ namespace UIModule.Panels
             var character = _model.GetCharacterConfig().GetCharacters()[index];
             _characterView.SetCharacterName(character.GetName());
             _characterView.SetLevel(character.GetLevel());
+            character.SetIsNewCharacter(false);
         }
 
         private void RefreshCharacterStoryRedDot(string redDotName, int result, RedDotType redDotType)

@@ -18,6 +18,8 @@ namespace UIModule.Data.Models
         private Sprite _avatarSprite;
         [SerializeField]
         private Sprite _portraitSprite;
+        [SerializeField] 
+        private bool _isNewCharacter;
 
         public string GetId()
         {
@@ -77,6 +79,16 @@ namespace UIModule.Data.Models
         public void SetPortraitSprite(Sprite sprite)
         {
             _portraitSprite = sprite;
+        }
+        
+        public bool GetIsNewCharacter()
+        {
+            return _isNewCharacter;
+        }
+        
+        public void SetIsNewCharacter(bool isNewCharacter)
+        {
+            _isNewCharacter = isNewCharacter;
         }
     }
 }

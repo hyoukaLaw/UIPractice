@@ -13,7 +13,7 @@ using UnityEngine;
 /// RedDotInfo.cs
 /// 红点信息类
 /// </summary>
-public class RedDotInfo
+public class RedDotInfo // 关联红点名，红点运算单元和UI刷新回调
 {
     /// <summary>
     /// 红点名
