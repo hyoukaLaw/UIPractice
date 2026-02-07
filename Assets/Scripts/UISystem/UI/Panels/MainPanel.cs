@@ -19,6 +19,7 @@ namespace UIModule.Panels
             Log.LogInfo($"MainPanel OnEnter");
             _view.OnCharacterClick += OpenCharacterPanel;
             _view.OnBagClick += OpenBagPanel;
+            RegisterRedDotCallback();
         }
 
         public override void OnExit()
@@ -26,6 +27,7 @@ namespace UIModule.Panels
             Log.LogInfo($"MainPanel OnExit");
             _view.OnCharacterClick -= OpenCharacterPanel;
             _view.OnBagClick -= OpenBagPanel;
+            UnregisterRedDotCallback();
         }
 
         public override void OnPause()
@@ -37,6 +39,25 @@ namespace UIModule.Panels
         {
             Log.LogInfo($"MainPanel OnResume");
             RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.MAIN_UI_CHARACTER_NEW);
+        }
+
+        private void RegisterRedDotCallback()
+        {
+            RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(RedDotNames.MAIN_UI_CHARACTER, RefreshCharacterRedDot);
+        }
+
+        private void UnregisterRedDotCallback()
+        {
+            RedDotManager.Singleton.UnbindRedDotName(RedDotNames.MAIN_UI_CHARACTER, RefreshCharacterRedDot);
+        }
+
+        private void RefreshCharacterRedDot(string redDotName, int result, RedDotType redDotType)
+        {
+            if (redDotName != RedDotNames.MAIN_UI_CHARACTER)
+            {
+                return;
+            }
+            _view.SetCharacterRedDot(result > 0);
         }
 
         private void OpenCharacterPanel()

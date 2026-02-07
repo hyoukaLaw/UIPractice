@@ -9,6 +9,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum RedDotUnitCalculateMode
+{
+    LEAF,
+    COMPOSITE,
+}
+
+public enum RedDotUnitAggregateMode
+{
+    SUM,
+    ANY_POSITIVE,
+}
+
 /// <summary>
 /// RedDotUnitInfo.cs
 /// 红点运算单元信息类
@@ -63,6 +75,24 @@ public class RedDotUnitInfo
         private set;
     }
 
+    public RedDotUnitCalculateMode CalculateMode
+    {
+        get;
+        private set;
+    }
+
+    public RedDotUnitAggregateMode AggregateMode
+    {
+        get;
+        private set;
+    }
+
+    public List<RedDotUnit> DependencyUnits
+    {
+        get;
+        private set;
+    }
+
     private RedDotUnitInfo()
     {
 
@@ -82,6 +112,9 @@ public class RedDotUnitInfo
         RedDotUnitCalculateFunc = redDotUnitCalculateFunc;
         RedDotType = redDotType;
         SupportIdParameter = false;
+        CalculateMode = RedDotUnitCalculateMode.LEAF;
+        AggregateMode = RedDotUnitAggregateMode.SUM;
+        DependencyUnits = null;
     }
 
     public RedDotUnitInfo(RedDotUnit redDotUnit, string redDotUnitDes, Func<int, int> redDotUnitCalculateFunc, RedDotType redDotType)
@@ -91,5 +124,19 @@ public class RedDotUnitInfo
         RedDotUnitCalculateFuncWithId = redDotUnitCalculateFunc;
         RedDotType = redDotType;
         SupportIdParameter = true;
+        CalculateMode = RedDotUnitCalculateMode.LEAF;
+        AggregateMode = RedDotUnitAggregateMode.SUM;
+        DependencyUnits = null;
+    }
+
+    public RedDotUnitInfo(RedDotUnit redDotUnit, string redDotUnitDes, List<RedDotUnit> dependencyUnits, RedDotType redDotType, RedDotUnitAggregateMode redDotUnitAggregateMode)
+    {
+        RedDotUnit = redDotUnit;
+        RedDotUnitDes = redDotUnitDes;
+        RedDotType = redDotType;
+        SupportIdParameter = false;
+        CalculateMode = RedDotUnitCalculateMode.COMPOSITE;
+        AggregateMode = redDotUnitAggregateMode;
+        DependencyUnits = dependencyUnits;
     }
 }

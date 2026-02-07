@@ -12,7 +12,6 @@ public class UIInit : MonoBehaviour
         RedDotManager.Singleton.Init();
         RegisterDynamicRedDot();
         RedDotManager.Singleton.DoAllRedDotUnitCaculate();
-        MarkCharacterRedDotDirty();
         UIManager.Instance.ShowPanel(UIPanelType.Main);
     }
 

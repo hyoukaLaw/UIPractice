@@ -23,17 +23,12 @@ namespace UIModule.Panels
         {
             _characterPanelButton.onClick.AddListener(OnCharacterButtonClick);
             _bagPanelButton.onClick.AddListener(OnBagButtonClick);
-            RedDotManager.Singleton.BindRedDotName(RedDotNames.MAIN_UI_CHARACTER, OnRedDotRefresh);
-            (int result, RedDotType redDotType) redDotNameResult;
-            redDotNameResult = RedDotManager.Singleton.GetRedDotNameResult(RedDotNames.MAIN_UI_CHARACTER);
-            OnRedDotRefresh(RedDotNames.MAIN_UI_CHARACTER, redDotNameResult.result, redDotNameResult.redDotType);
         }
 
         private void OnDisable()
         {
             _characterPanelButton.onClick.RemoveListener(OnCharacterButtonClick);
             _bagPanelButton.onClick.RemoveListener(OnBagButtonClick);
-            RedDotManager.Singleton.UnbindRedDotName(RedDotNames.MAIN_UI_CHARACTER, OnRedDotRefresh);
         }
 
         private void OnCharacterButtonClick()
@@ -46,12 +41,9 @@ namespace UIModule.Panels
             OnBagClick?.Invoke();
         }
 
-        private void OnRedDotRefresh(string redDotName, int result, RedDotType redDotType)
+        public void SetCharacterRedDot(bool show)
         {
-            if (redDotName == RedDotNames.MAIN_UI_CHARACTER)
-            {
-                _redDotWidget.gameObject.SetActive(result > 0);
-            }
+            _redDotWidget.gameObject.SetActive(show);
         }
     }
 }

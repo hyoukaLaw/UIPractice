@@ -72,13 +72,13 @@ namespace UIModule.Panels
             foreach (var item in _model.GetCharacterConfig().GetCharacters())
             {
                 string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotName, RefreshCharacterRedDot);
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotName, RefreshCharacterRedDot);
 
                 string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
-                
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameStory, RefreshCharacterStoryRedDot);
+                 
                 string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
+                RedDotManager.Singleton.BindRedDotNameAndReplayCurrent(redDotNameCg, RefreshCharacterCgRedDot);
             }
             _characterView.OnCloseClick += CloseCurrent;
             _characterView.OnStoryPanelClick += OpenStory;
