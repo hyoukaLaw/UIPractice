@@ -10,5 +10,6 @@ namespace UIModule.Interfaces
         void SetRedDot(bool show);
         event Action<int> OnClickEvent;
         int GetIndex();
+        int GetCharacterId();
     }
 }

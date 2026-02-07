@@ -7,7 +7,7 @@ namespace UIModule.Data.Models
     public class SerializableCharacterData
     {
         [SerializeField]
-        private string _id;
+        private int _id;
         [SerializeField]
         private string _name;
         [SerializeField]
@@ -23,12 +23,12 @@ namespace UIModule.Data.Models
         [SerializeField] 
         private bool _hasNewCg;
 
-        public string GetId()
+        public int GetId()
         {
             return _id;
         }
 
-        public void SetId(string id)
+        public void SetId(int id)
         {
             _id = id;
         }

@@ -19,7 +19,7 @@ namespace UIModule.Data.Models
             _characters = characters;
         }
 
-        public SerializableCharacterData GetCharacterById(string id)
+        public SerializableCharacterData GetCharacterById(int id)
         {
             if (_characters == null)
             {
@@ -35,7 +35,7 @@ namespace UIModule.Data.Models
             return null;
         }
 
-        public int GetCharacterIndexById(string id)
+        public int GetCharacterIndexById(int id)
         {
             if (_characters == null)
             {

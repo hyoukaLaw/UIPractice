@@ -49,6 +49,9 @@ namespace UIModule.Panels
                 
                 string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.BindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
+                
+                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_STORY_NEW, item.GetId());
+                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_CG_NEW, item.GetId());
             }
             _characterView.SetCharacterList(characterListItems);
             SelectCharacter(0);
@@ -132,13 +135,13 @@ namespace UIModule.Panels
         private void RefreshCharacterRedDot(string redDotName, int result, RedDotType redDotType)
         {
             int characterId;
-            if (!TryParseRedDotNameId(redDotName, out characterId))
+            if (!RedDotManager.Singleton.TryParseRedDotNameWithId(redDotName, out characterId))
             {
                 return;
             }
             foreach (var item in _characterListItemUIs)
             {
-                if (item.GetIndex() == characterId)
+                if (item.GetCharacterId() == characterId)
                 {
                     item.SetRedDot(result > 0);
                 }
@@ -148,12 +151,13 @@ namespace UIModule.Panels
         private void RefreshCharacterStoryRedDot(string redDotName, int result, RedDotType redDotType)
         {
             int characterId;
-            if (!TryParseRedDotNameId(redDotName, out characterId))
+            if (!RedDotManager.Singleton.TryParseRedDotNameWithId(redDotName, out characterId))
             {
                 return;
             }
 
-            if (_model.GetSelectedIndex() == characterId)
+            var selectedCharacter = _model.GetSelectedCharacter();
+            if (selectedCharacter != null && selectedCharacter.GetId() == characterId)
             {
                 _characterView.SetStoryRedDot(result > 0);
             }
@@ -162,31 +166,17 @@ namespace UIModule.Panels
         private void RefreshCharacterCgRedDot(string redDotName, int result, RedDotType redDotType)
         {
             int characterId;
-            if (!TryParseRedDotNameId(redDotName, out characterId))
+            if (!RedDotManager.Singleton.TryParseRedDotNameWithId(redDotName, out characterId))
             {
                 return;
             }
 
-            if (_model.GetSelectedIndex() == characterId)
+            var selectedCharacter = _model.GetSelectedCharacter();
+            if (selectedCharacter != null && selectedCharacter.GetId() == characterId)
             {
                 _characterView.SetCgRedDot(result > 0);
             }
         }
         
-        
-        private bool TryParseRedDotNameId(string redDotName, out int id)
-        {
-            id = 0;
-            if (string.IsNullOrEmpty(redDotName))
-            {
-                return false;
-            }
-            var parts = redDotName.Split('|');
-            if (parts.Length < 2)
-            {
-                return false;
-            }
-            return int.TryParse(parts[parts.Length - 1], out id);
-        }
     }
 }

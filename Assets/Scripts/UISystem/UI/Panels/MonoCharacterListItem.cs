@@ -22,6 +22,7 @@ namespace UIModule.Panels
         private RedDotWidget _redDotWidget;
 
         private int _index;
+        private int _characterId;
 
         private void Awake()
         {
@@ -40,6 +41,7 @@ namespace UIModule.Panels
         public void SetData(SerializableCharacterData data, int index)
         {
             _index = index;
+            _characterId = data.GetId();
             if (_avatarImage != null)
             {
                 _avatarImage.sprite = data.GetAvatarSprite();
@@ -69,6 +71,11 @@ namespace UIModule.Panels
         public int GetIndex()
         {
             return _index;
+        }
+
+        public int GetCharacterId()
+        {
+            return _characterId;
         }
     }
 }

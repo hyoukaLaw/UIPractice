@@ -32,7 +32,7 @@ public class RedDotNameWithId : IEquatable<RedDotNameWithId>
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != GetType()) return false;
-        return Equals((RedDotUnitWithId)obj);
+        return Equals((RedDotNameWithId)obj);
     }
     
     public override int GetHashCode()
@@ -568,7 +568,12 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
 
             if (_redDotUnitWithIdMap.ContainsKey(new RedDotUnitWithId(redDotUnit, id)))
             {
-                _redDotUnitWithIdMap[new RedDotUnitWithId(redDotUnit, id)].Remove(new RedDotNameWithId(redDotName, id));
+                var redDotUnitWithId = new RedDotUnitWithId(redDotUnit, id);
+                _redDotUnitWithIdMap[redDotUnitWithId].Remove(new RedDotNameWithId(redDotName, id));
+                if (_redDotUnitWithIdMap[redDotUnitWithId].Count == 0)
+                {
+                    _redDotUnitWithIdMap.Remove(redDotUnitWithId);
+                }
             }
         }
         mRedDotNameResultMap.Remove(redDotName);

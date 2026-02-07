@@ -181,19 +181,19 @@ public static class RedDotUtilities
 
     public static int CalculateCharacterStoryNew(int characterId)
     {
-        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId);
         return characterData.GetHasNewStory() ? 1 : 0;
     }
 
     public static int CalculateCharacterCgNew(int characterId)
     {
-        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId);
         return characterData.GetHasNewCg() ? 1 : 0;
     }
 
     public static int CalculateCharacterNew(int characterId)
     {
-        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId);
         return characterData.GetHasNewCg() || characterData.GetHasNewStory() ? 1 : 0;
     }
     
