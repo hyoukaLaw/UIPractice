@@ -37,25 +37,14 @@ namespace UIModule.Panels
             { 
                 GameObject gameObjectItem = Object.Instantiate(gameObjectItemPrefab);
                 ICharacterListItem characterListItem = gameObjectItem.GetComponent<ICharacterListItem>();
-                characterListItem.OnClickEvent += SelectCharacter;
                 characterListItem.SetData(item, index++);
                 _characterListItemUIs.Add(characterListItem);
                 characterListItems.Add(gameObjectItem);
-                string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotName, RefreshCharacterRedDot);
-
-                string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
-                
-                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
-                RedDotManager.Singleton.BindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
-                
-                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_STORY_NEW, item.GetId());
-                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_CG_NEW, item.GetId());
             }
             _characterView.SetCharacterList(characterListItems);
             SelectCharacter(0);
             RegisterCallback();
+            MarkAllCharacterRedDotDirty();
         }
 
         public override void OnExit()
@@ -76,6 +65,21 @@ namespace UIModule.Panels
 
         public void RegisterCallback()
         {
+            foreach (var item in _characterListItemUIs)
+            {
+                item.OnClickEvent += SelectCharacter;
+            }
+            foreach (var item in _model.GetCharacterConfig().GetCharacters())
+            {
+                string redDotName = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotName(redDotName, RefreshCharacterRedDot);
+
+                string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
+                
+                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
+            }
             _characterView.OnCloseClick += CloseCurrent;
             _characterView.OnStoryPanelClick += OpenStory;
             _characterView.OnCgPanelClick += OpenConfirm;
@@ -89,7 +93,6 @@ namespace UIModule.Panels
             foreach (var item in _characterListItemUIs)
             {
                 item.OnClickEvent -= SelectCharacter;
-
             }
 
             foreach (var item in _model.GetCharacterConfig().GetCharacters())
@@ -102,6 +105,15 @@ namespace UIModule.Panels
 
                 string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.UnbindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
+            }
+        }
+
+        private void MarkAllCharacterRedDotDirty()
+        {
+            foreach (var item in _model.GetCharacterConfig().GetCharacters())
+            {
+                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_STORY_NEW, item.GetId());
+                RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_CG_NEW, item.GetId());
             }
         }
 
@@ -130,6 +142,8 @@ namespace UIModule.Panels
             var character = _model.GetCharacterConfig().GetCharacters()[index];
             _characterView.SetCharacterName(character.GetName());
             _characterView.SetLevel(character.GetLevel());
+            RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_STORY_NEW, character.GetId());
+            RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_CG_NEW, character.GetId());
         }
 
         private void RefreshCharacterRedDot(string redDotName, int result, RedDotType redDotType)

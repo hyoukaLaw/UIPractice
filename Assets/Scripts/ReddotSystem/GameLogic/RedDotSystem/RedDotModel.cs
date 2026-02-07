@@ -88,6 +88,8 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
     /// </summary>
     private Dictionary<RedDotUnit, int> mRedDotUnitResultMap;
 
+    private Dictionary<RedDotUnitWithId, int> mRedDotUnitResultWithIdMap;
+
     /// <summary>
     /// 红点名和红点信息Map<红点名, 红点信息>
     /// </summary>
@@ -124,6 +126,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
     {
         mRedDotUnitInfoMap = new Dictionary<RedDotUnit, RedDotUnitInfo>();
         mRedDotUnitResultMap = new Dictionary<RedDotUnit, int>();
+        mRedDotUnitResultWithIdMap = new Dictionary<RedDotUnitWithId, int>();
         mRedDotInfoMap = new Dictionary<string, RedDotInfo>();
         mRedDotUnitNameMap = new Dictionary<RedDotUnit, List<string>>();
         mRedDotNameResultMap = new Dictionary<string, int>();
@@ -482,6 +485,15 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         return result;
     }
 
+    public int GetRedDotUnitResult(RedDotUnit redDotUnit, int id)
+    {
+        int result = 0;
+        if(!mRedDotUnitResultWithIdMap.TryGetValue(new RedDotUnitWithId(redDotUnit, id), out result))
+        {
+        }
+        return result;
+    }
+
     /// <summary>
     /// 设置指定红点运算单元的运算结果
     /// </summary>
@@ -497,6 +509,23 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         }
         mRedDotUnitResultMap[redDotUnit] = result;
         return true;
+    }
+
+    public bool SetRedDotUnitResult(RedDotUnit redDotUnit, int id, int result)
+    {
+        var redDotUnitWithId = new RedDotUnitWithId(redDotUnit, id);
+        if(!mRedDotUnitResultWithIdMap.ContainsKey(redDotUnitWithId))
+        {
+            mRedDotUnitResultWithIdMap.Add(redDotUnitWithId, result);
+            return true;
+        }
+        mRedDotUnitResultWithIdMap[redDotUnitWithId] = result;
+        return true;
+    }
+
+    public bool RemoveRedDotUnitResult(RedDotUnit redDotUnit, int id)
+    {
+        return mRedDotUnitResultWithIdMap.Remove(new RedDotUnitWithId(redDotUnit, id));
     }
 
     public RedDotInfo RegisterDynamicRedDot(int id, string redDotName, string redDotDes, RedDotUnit redDotUnit)
@@ -575,6 +604,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
                     _redDotUnitWithIdMap.Remove(redDotUnitWithId);
                 }
             }
+            RemoveRedDotUnitResult(redDotUnit, id);
         }
         mRedDotNameResultMap.Remove(redDotName);
         RedDotTrie.RemoveWord(redDotName);

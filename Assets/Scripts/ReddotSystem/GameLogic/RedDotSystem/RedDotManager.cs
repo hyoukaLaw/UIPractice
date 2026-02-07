@@ -154,11 +154,11 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     public (int result, RedDotType redDotType) GetRedDotNameResultWithId(string redDotName)
     {
         (int result, RedDotType redDotType) redDotNameResult = (0, RedDotType.NONE);
-        int nameResult = RedDotModel.Singleton.GetRedDotNameResult(redDotName);
-        redDotNameResult.result = nameResult;
+        redDotNameResult.result = 0;
         var redDotUnitList = RedDotModel.Singleton.GetRedDotUnitsByName(redDotName);
         if (redDotUnitList != null)
         {
+            var result = 0;
             var redDotType = RedDotType.NONE;
             var redDotInfo = RedDotModel.Singleton.GetRedDotInfoByName(redDotName);
             var id = redDotInfo != null && redDotInfo.IsIdBased ? redDotInfo.Id : 0;
@@ -168,7 +168,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
                 var redDotUnitInfo = RedDotModel.Singleton.GetRedDotUnitInfo(redDotUnit);
                 if (redDotUnitInfo != null && redDotUnitInfo.SupportIdParameter)
                 {
-                    redDotUnitResult = redDotUnitInfo.RedDotUnitCalculateFuncWithId != null ? redDotUnitInfo.RedDotUnitCalculateFuncWithId(id) : 0;
+                    redDotUnitResult = RedDotModel.Singleton.GetRedDotUnitResult(redDotUnit, id);
                 }
                 else
                 {
@@ -179,7 +179,9 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
                     var redDotType2 = RedDotModel.Singleton.GetRedDotUnitRedType(redDotUnit);
                     redDotType = redDotType | redDotType2;
                 }
+                result += redDotUnitResult;
             }
+            redDotNameResult.result = result;
             redDotNameResult.redDotType = redDotType;
         }
         return redDotNameResult;
@@ -404,22 +406,26 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         var totalResult = 0;
         foreach (var redDotUnit in redDotUnitList)
         {
+            var redDotUnitResult = 0;
             var redDotUnitInfo = RedDotModel.Singleton.GetRedDotUnitInfo(redDotUnit);
             if (redDotUnitInfo != null && redDotUnitInfo.SupportIdParameter)
             {
                 if (redDotUnitInfo.RedDotUnitCalculateFuncWithId != null)
                 {
-                    totalResult += redDotUnitInfo.RedDotUnitCalculateFuncWithId(id);
+                    redDotUnitResult = redDotUnitInfo.RedDotUnitCalculateFuncWithId(id);
                 }
+                RedDotModel.Singleton.SetRedDotUnitResult(redDotUnit, id, redDotUnitResult);
             }
             else
             {
                 var func = RedDotModel.Singleton.GetRedDotUnitFunc(redDotUnit);
                 if (func != null)
                 {
-                    totalResult += func();
+                    redDotUnitResult = func();
                 }
+                RedDotModel.Singleton.SetRedDotUnitResult(redDotUnit, redDotUnitResult);
             }
+            totalResult += redDotUnitResult;
         }
         var preResult = RedDotModel.Singleton.GetRedDotNameResult(redDotName);
         RedDotModel.Singleton.SetRedDotNameResult(redDotName, totalResult);
