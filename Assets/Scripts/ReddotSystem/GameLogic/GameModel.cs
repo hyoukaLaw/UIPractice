@@ -209,7 +209,7 @@ public class GameModel : SingletonTemplate<GameModel>
     /// 设置新其他邮件数
     /// </summary>
     /// <param name="newOtherMailNum"></param>
-    public void SetmNewOtherMailNum(int newOtherMailNum)
+    public void SetNewOtherMailNum(int newOtherMailNum)
     {
         newOtherMailNum = Mathf.Clamp(newOtherMailNum, 0, newOtherMailNum);
         if (NewOtherMailNum != newOtherMailNum)

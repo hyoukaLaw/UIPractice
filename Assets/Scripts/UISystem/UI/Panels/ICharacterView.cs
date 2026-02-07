@@ -12,9 +12,6 @@ namespace UIModule.Interfaces
         void SetCharacterList(List<GameObject> characterList);
         void SetStoryRedDot(bool show);
         void SetCgRedDot(bool show);
-        void SetSelectedCharacter(int index);
-        void ShowView();
-        void HideView();
         event Action OnCloseClick;
         event Action OnStoryPanelClick;
         event Action OnCgPanelClick;

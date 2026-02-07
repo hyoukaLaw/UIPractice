@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using TMPro;
 using UIModule.Adapters;
-using UIModule.Core;
 using UIModule.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +10,6 @@ namespace UIModule.Panels
     {
         [SerializeField]
         private Button _closeButton;
-        [SerializeField]
-        private InfiniteScrollRect _infiniteScrollRect;
         
         private void OnEnable()
         {
@@ -31,12 +26,6 @@ namespace UIModule.Panels
                 _closeButton.onClick.RemoveListener(OnCloseButtonClick);
             }
         }
-        
-
-        public void SetSelectedItemIndex(int index)
-        {
-        }
-
         public void ShowView()
         {
             gameObject.SetActive(true);
@@ -48,7 +37,6 @@ namespace UIModule.Panels
         }
 
         public event Action OnCloseClick;
-        public event Action<int> OnItemClick;
 
         private void OnCloseButtonClick()
         {

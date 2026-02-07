@@ -54,7 +54,7 @@ public class Trie
     /// <summary>
     /// 单词列表(用于缓存分割结果，优化单个单词判定时重复分割问题)
     /// </summary>
-    private List<string> mWordList;
+    private List<string> _wordList;
 
     /// <summary>
     /// 构造函数
@@ -65,9 +65,9 @@ public class Trie
         Separator = separator;
         WorldCount = 0;
         TrieDeepth = 0;
-        RootNode = ObjectPool.Singleton.pop<TrieNode>();
+        RootNode = ObjectPool.Singleton.Pop<TrieNode>();
         RootNode.Init("Root", null, this, 0, false);
-        mWordList = new List<string>();
+        _wordList = new List<string>();
     }
 
     /// <summary>
@@ -76,14 +76,14 @@ public class Trie
     /// <param name="word"></param>
     public void AddWord(string word)
     {
-        mWordList.Clear();
+        _wordList.Clear();
         var words = word.Split(Separator);
-        mWordList.AddRange(words);
-        var length = mWordList.Count;
+        _wordList.AddRange(words);
+        var length = _wordList.Count;
         var node = RootNode;
         for (int i = 0; i < length; i++)
         {
-            var spliteWord = mWordList[i];
+            var spliteWord = _wordList[i];
             var isLast = i == (length - 1);
             if (!node.ContainWord(spliteWord))
             {
@@ -210,10 +210,10 @@ public class Trie
         {
             return false;
         }
-        mWordList.Clear();
+        _wordList.Clear();
         var wordArray = word.Split(Separator);
-        mWordList.AddRange(wordArray);
-        return FindWord(RootNode, mWordList);
+        _wordList.AddRange(wordArray);
+        return FindWord(RootNode, _wordList);
     }
 
     /// <summary>
@@ -249,10 +249,10 @@ public class Trie
         {
             return false;
         }
-        mWordList.Clear();
+        _wordList.Clear();
         var wordArray = word.Split(Separator);
-        mWordList.AddRange(wordArray);
-        return MatchWord(RootNode, mWordList);
+        _wordList.AddRange(wordArray);
+        return MatchWord(RootNode, _wordList);
     }
 
     /// <summary>

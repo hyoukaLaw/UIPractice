@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UIModule.Data.Models;
+using UIModule.Data;
+using UIModule.Adapters;
 
 namespace UIModule.Core
 {
-    using Data;
-    using Adapters;
-
     public class UIManager
     {
         private static readonly Lazy<UIManager> _instance = new(() => new UIManager());
@@ -47,6 +46,10 @@ namespace UIModule.Core
             _stack.Push(panelData);
             _activePanels.Add(type, panel);
             _activeMonoPanels.Add(type, monoPanel);
+            if (panelModel != null)
+            {
+                _activePanelModels[type] = panelModel;
+            }
             panel.OnEnter(args);
         }
 
@@ -74,6 +77,7 @@ namespace UIModule.Core
             }
             _activePanels.Remove(type);
             _activeMonoPanels.Remove(type);
+            _activePanelModels.Remove(type);
             UIAssetLoader.Destroy(monoPanel.gameObject);
             
             if (config?.IsModal == true)

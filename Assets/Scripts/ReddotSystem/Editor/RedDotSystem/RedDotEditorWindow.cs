@@ -30,42 +30,42 @@ public class RedDotEditorWindow : EditorWindow
     /// <summary>
     /// 红点系统页签名字
     /// </summary>
-    private string[] mRedDotTagNames = new string[3] { "红点树", "红点运算单元", "红点名详情" };
+    private string[] _redDotTagNames = new string[3] { "红点树", "红点运算单元", "红点名详情" };
 
     /// <summary>
     /// 当前页签选择索引
     /// </summary>
-    private int mSelectedTagIndex = 0;
+    private int _selectedTagIndex = 0;
 
     /// <summary>
     /// 当前选择节点
     /// </summary>
-    private TrieNode mSelectedTrieNode;
+    private TrieNode _selectedTrieNode;
 
     /// <summary>
     /// 当前滚动位置
     /// </summary>
-    private Vector2 mCurrentScrollPos;
+    private Vector2 _currentScrollPos;
 
     /// <summary>
     /// 红点名展开信息Map<红点名, 是否展开>
     /// </summary>
-    private Dictionary<string, bool> mRedDotNameUnfoldMap = new Dictionary<string, bool>();
+    private Dictionary<string, bool> _redDotNameUnfoldMap = new Dictionary<string, bool>();
 
     /// <summary>
     /// 红点名列表(缓存红点名列表避免内存开销)
     /// </summary>
-    private List<string> mRedDotNameList;
+    private List<string> _redDotNameList;
 
     /// <summary>
     /// 红点运算单元搜索栏
     /// </summary>
-    private SearchField mRedDotUnitSearchField;
+    private SearchField _redDotUnitSearchField;
 
     /// <summary>
     /// 红点运算单元搜索文本
     /// </summary>
-    private string mRedDotUnitSearchText;
+    private string _redDotUnitSearchText;
 
     /// <summary>
     /// 打开红点系统可视化窗口
@@ -84,14 +84,14 @@ public class RedDotEditorWindow : EditorWindow
     {
         if(EditorApplication.isPlaying)
         {
-            if(RedDotModel.Singleton.IsInitCompelte)
+            if(RedDotModel.Singleton.IsInitComplete)
             {
-                if(mRedDotUnitSearchField == null)
+                if(_redDotUnitSearchField == null)
                 {
-                    mRedDotUnitSearchField = new SearchField();
+                    _redDotUnitSearchField = new SearchField();
                 }
                 DrawRedDotTagArea();
-                mCurrentScrollPos = EditorGUILayout.BeginScrollView(mCurrentScrollPos);
+                _currentScrollPos = EditorGUILayout.BeginScrollView(_currentScrollPos);
                 DrawRedDotContentArea();
                 EditorGUILayout.EndScrollView();
             }
@@ -111,7 +111,7 @@ public class RedDotEditorWindow : EditorWindow
     /// </summary>
     private void DrawRedDotTagArea()
     {
-        mSelectedTagIndex = GUILayout.SelectionGrid(mSelectedTagIndex, mRedDotTagNames, mRedDotTagNames.Length);
+        _selectedTagIndex = GUILayout.SelectionGrid(_selectedTagIndex, _redDotTagNames, _redDotTagNames.Length);
     }
 
     /// <summary>
@@ -119,15 +119,15 @@ public class RedDotEditorWindow : EditorWindow
     /// </summary>
     private void DrawRedDotContentArea()
     {
-        if (mSelectedTagIndex == (int)RedDotSystemTag.RED_DOT_TREE)
+        if (_selectedTagIndex == (int)RedDotSystemTag.RED_DOT_TREE)
         {
             DrawRedDotTreeArea();
         }
-        else if(mSelectedTagIndex == (int)RedDotSystemTag.RED_DOT_UNITS)
+        else if(_selectedTagIndex == (int)RedDotSystemTag.RED_DOT_UNITS)
         {
             DrawRedDotUnitsArea();
         }
-        else if(mSelectedTagIndex == (int)RedDotSystemTag.RED_DOT_DETAIL)
+        else if(_selectedTagIndex == (int)RedDotSystemTag.RED_DOT_DETAIL)
         {
             DrawRedDotDetailArea();
         }
@@ -159,10 +159,10 @@ public class RedDotEditorWindow : EditorWindow
     /// <param name="isUnfold">是否展开</param>
     private void FoldAllTrieNode(bool isUnfold)
     {
-        mRedDotNameList = mRedDotNameUnfoldMap.Keys.ToList();
-        foreach(var redDotName in mRedDotNameList)
+        _redDotNameList = _redDotNameUnfoldMap.Keys.ToList();
+        foreach(var redDotName in _redDotNameList)
         {
-            mRedDotNameUnfoldMap[redDotName] = isUnfold;
+            _redDotNameUnfoldMap[redDotName] = isUnfold;
         }
     }
 
@@ -173,9 +173,9 @@ public class RedDotEditorWindow : EditorWindow
     private void DrawTrieNode(TrieNode trieNode)
     {
         var redDotName = trieNode.GetFullWord();
-        if(!mRedDotNameUnfoldMap.ContainsKey(redDotName))
+        if(!_redDotNameUnfoldMap.ContainsKey(redDotName))
         {
-            mRedDotNameUnfoldMap.Add(redDotName, true);
+            _redDotNameUnfoldMap.Add(redDotName, true);
         }
         EditorGUILayout.BeginHorizontal("box");
         GUILayout.Space(trieNode.Depth * 20);
@@ -196,7 +196,7 @@ public class RedDotEditorWindow : EditorWindow
         }
         if (trieNode.ChildCount > 0)
         {
-            mRedDotNameUnfoldMap[redDotName] = EditorGUILayout.Foldout(mRedDotNameUnfoldMap[redDotName], redDotDisplayName);
+            _redDotNameUnfoldMap[redDotName] = EditorGUILayout.Foldout(_redDotNameUnfoldMap[redDotName], redDotDisplayName);
             GUI.color = preColor;
         }
         else
@@ -209,7 +209,7 @@ public class RedDotEditorWindow : EditorWindow
             DrawTrieNodeJumpUI(trieNode);
         }
         EditorGUILayout.EndHorizontal();
-        if (mRedDotNameUnfoldMap[redDotName])
+        if (_redDotNameUnfoldMap[redDotName])
         {
             foreach (var childNode in trieNode.ChildNodesMap)
             {
@@ -243,7 +243,7 @@ public class RedDotEditorWindow : EditorWindow
         var redDotUnitInfoMap = RedDotModel.Singleton.GetRedDotUnitInfoMap();
         foreach(var redDotUnitInfo in redDotUnitInfoMap)
         {
-            if(string.IsNullOrEmpty(mRedDotUnitSearchText) || redDotUnitInfo.Key.ToString().StartsWith(mRedDotUnitSearchText, System.StringComparison.OrdinalIgnoreCase))
+            if(string.IsNullOrEmpty(_redDotUnitSearchText) || redDotUnitInfo.Key.ToString().StartsWith(_redDotUnitSearchText, System.StringComparison.OrdinalIgnoreCase))
             {
                 DrawRedDotUnitInfo(redDotUnitInfo.Value);
             }
@@ -255,7 +255,7 @@ public class RedDotEditorWindow : EditorWindow
     /// </summary>
     private void DrawRedDotUnitSearchArea()
     {
-        mRedDotUnitSearchText = mRedDotUnitSearchField.OnGUI(mRedDotUnitSearchText, GUILayout.ExpandWidth(true));
+        _redDotUnitSearchText = _redDotUnitSearchField.OnGUI(_redDotUnitSearchText, GUILayout.ExpandWidth(true));
     }
 
     /// <summary>
@@ -310,10 +310,10 @@ public class RedDotEditorWindow : EditorWindow
     /// </summary>
     private void DrawRedDotDetailArea()
     {
-        if(mSelectedTrieNode != null)
+        if(_selectedTrieNode != null)
         {
-            var redDotName = mSelectedTrieNode.GetFullWord();
-            if (mSelectedTrieNode.IsTail)
+            var redDotName = _selectedTrieNode.GetFullWord();
+            if (_selectedTrieNode.IsTail)
             {
                 var redDotInfo = RedDotModel.Singleton.GetRedDotInfoByName(redDotName);
                 DrawRedDotInfo(redDotInfo);
@@ -356,7 +356,7 @@ public class RedDotEditorWindow : EditorWindow
     /// <param name="trieNode"></param>
     private void JumpToTrieNodeDetail(TrieNode trieNode)
     {
-        mSelectedTagIndex = (int)RedDotSystemTag.RED_DOT_DETAIL;
-        mSelectedTrieNode = trieNode;
+        _selectedTagIndex = (int)RedDotSystemTag.RED_DOT_DETAIL;
+        _selectedTrieNode = trieNode;
     }
 }

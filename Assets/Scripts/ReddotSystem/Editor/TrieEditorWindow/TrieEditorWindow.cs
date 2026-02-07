@@ -19,32 +19,32 @@ public class TrieEditorWindow : EditorWindow
     /// <summary>
     /// 居中Button GUI Style
     /// </summary>
-    private GUIStyle mButtonMidStyle;
+    private GUIStyle _buttonMidStyle;
 
     /// <summary>
     /// 前缀树
     /// </summary>
-    private Trie mTrie;
+    private Trie _trie;
 
     /// <summary>
     /// 当前滚动位置
     /// </summary>
-    private Vector2 mCurrentScrollPos;
+    private Vector2 _currentScrollPos;
 
     /// <summary>
     /// 输入单词
     /// </summary>
-    private string mInputWord;
+    private string _inputWord;
 
     /// <summary>
     /// 节点展开Map<节点单词全名, 是否展开> 
     /// </summary>
-    private Dictionary<string, bool> mTrieNodeUnfoldMap = new Dictionary<string, bool>();
+    private Dictionary<string, bool> _trieNodeUnfoldMap = new Dictionary<string, bool>();
 
     /// <summary>
     /// 前缀树单词列表
     /// </summary>
-    private List<string> mTrieWordList;
+    private List<string> _trieWordList;
 
     [MenuItem("Tools/前缀树测试窗口")]
     static void Init()
@@ -57,7 +57,7 @@ public class TrieEditorWindow : EditorWindow
     {
         InitGUIStyle();
         InitData();
-        mCurrentScrollPos = EditorGUILayout.BeginScrollView(mCurrentScrollPos);
+        _currentScrollPos = EditorGUILayout.BeginScrollView(_currentScrollPos);
         EditorGUILayout.BeginVertical();
         DisplayTrieOperationArea();
         DisplayTrieContentArea();
@@ -71,9 +71,9 @@ public class TrieEditorWindow : EditorWindow
     /// </summary>
     private void InitGUIStyle()
     {
-        if(mButtonMidStyle == null)
+        if(_buttonMidStyle == null)
         {
-            mButtonMidStyle = new GUIStyle("ButtonMid");
+            _buttonMidStyle = new GUIStyle("ButtonMid");
         }
     }
 
@@ -82,10 +82,10 @@ public class TrieEditorWindow : EditorWindow
     /// </summary>
     private void InitData()
     {
-        if (mTrie == null)
+        if (_trie == null)
         {
-            mTrie = new Trie();
-            mTrieWordList = null;
+            _trie = new Trie();
+            _trieWordList = null;
         }
     }
 
@@ -94,7 +94,7 @@ public class TrieEditorWindow : EditorWindow
     /// </summary>
     private void UpdateTrieWordList()
     {
-        mTrieWordList = mTrie.GetWordList();
+        _trieWordList = _trie.GetWordList();
     }
 
     /// <summary>
@@ -104,28 +104,28 @@ public class TrieEditorWindow : EditorWindow
     {
         EditorGUILayout.BeginHorizontal("box");
         EditorGUILayout.LabelField("单词:", GUILayout.Width(40f), GUILayout.Height(20f));
-        mInputWord = EditorGUILayout.TextField(mInputWord, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
+        _inputWord = EditorGUILayout.TextField(_inputWord, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
         if(GUILayout.Button("添加", GUILayout.Width(120f), GUILayout.Height(20f)))
         {
-            if (string.IsNullOrEmpty(mInputWord))
+            if (string.IsNullOrEmpty(_inputWord))
             {
                 Debug.LogError($"不能允许添加空单词!");
             }
             else
             {
-                mTrie.AddWord(mInputWord);
+                _trie.AddWord(_inputWord);
                 UpdateTrieWordList();
             }
         }
         if (GUILayout.Button("删除", GUILayout.Width(120f), GUILayout.Height(20f)))
         {
-            if(string.IsNullOrEmpty(mInputWord))
+            if(string.IsNullOrEmpty(_inputWord))
             {
                 Debug.LogError($"不能允许删除空单词!");
             }
             else
             {
-                mTrie.RemoveWord(mInputWord);
+                _trie.RemoveWord(_inputWord);
             }
         }
         EditorGUILayout.EndHorizontal();
@@ -137,8 +137,8 @@ public class TrieEditorWindow : EditorWindow
     private void DisplayTrieContentArea()
     {
         EditorGUILayout.BeginVertical("box");
-        EditorGUILayout.LabelField("前缀树节点信息", mButtonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
-        DisplayTrieNode(mTrie.RootNode);
+        EditorGUILayout.LabelField("前缀树节点信息", _buttonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
+        DisplayTrieNode(_trie.RootNode);
         EditorGUILayout.EndVertical();
     }
 
@@ -149,23 +149,23 @@ public class TrieEditorWindow : EditorWindow
     private void DisplayTrieNode(TrieNode trieNode)
     {
         var nodeFullWord = trieNode.GetFullWord();
-        if(!mTrieNodeUnfoldMap.ContainsKey(nodeFullWord))
+        if(!_trieNodeUnfoldMap.ContainsKey(nodeFullWord))
         {
-            mTrieNodeUnfoldMap.Add(nodeFullWord, true);
+            _trieNodeUnfoldMap.Add(nodeFullWord, true);
         }
         EditorGUILayout.BeginHorizontal("box");
         GUILayout.Space(trieNode.Depth * 20);
         var displayName = $"{trieNode.NodeValue}({trieNode.Depth})";
         if (trieNode.ChildCount > 0)
         {
-            mTrieNodeUnfoldMap[nodeFullWord] = EditorGUILayout.Foldout(mTrieNodeUnfoldMap[nodeFullWord], displayName);
+            _trieNodeUnfoldMap[nodeFullWord] = EditorGUILayout.Foldout(_trieNodeUnfoldMap[nodeFullWord], displayName);
         }
         else
         {
             EditorGUILayout.LabelField(displayName);
         }
         EditorGUILayout.EndHorizontal();
-        if(mTrieNodeUnfoldMap[nodeFullWord] && trieNode.ChildCount > 0)
+        if(_trieNodeUnfoldMap[nodeFullWord] && trieNode.ChildCount > 0)
         {
             var childNodeValueList = trieNode.ChildNodesMap.Keys.ToList();
             foreach(var childNodeValue in childNodeValueList)
@@ -182,10 +182,10 @@ public class TrieEditorWindow : EditorWindow
     private void DisplayTrieWordsArea()
     {
         EditorGUILayout.BeginVertical("box");
-        EditorGUILayout.LabelField("前缀树单词信息", mButtonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
-        if(mTrieWordList != null)
+        EditorGUILayout.LabelField("前缀树单词信息", _buttonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
+        if(_trieWordList != null)
         {
-            foreach (var word in mTrieWordList)
+            foreach (var word in _trieWordList)
             {
                 EditorGUILayout.LabelField(word, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
             }

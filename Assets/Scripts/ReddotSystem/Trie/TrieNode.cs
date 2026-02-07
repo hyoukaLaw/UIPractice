@@ -146,7 +146,7 @@ public class TrieNode : IRecycle
             Debug.Log($"节点字符串:{NodeValue}已存在字符串:{nodeWord}的子节点,不重复添加子节点!");
             return node;
         }
-        node = ObjectPool.Singleton.pop<TrieNode>();
+        node = ObjectPool.Singleton.Pop<TrieNode>();
         node.Init(nodeWord, this, OwnerTree, Depth + 1, isTail);
         ChildNodesMap.Add(nodeWord, node);
         return node;
@@ -182,7 +182,7 @@ public class TrieNode : IRecycle
             return false;
         }
         ChildNodesMap.Remove(childNode.NodeValue);
-        ObjectPool.Singleton.push<TrieNode>(childNode);
+        ObjectPool.Singleton.Push<TrieNode>(childNode);
         return true;
     }
 

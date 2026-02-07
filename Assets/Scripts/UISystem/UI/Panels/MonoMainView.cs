@@ -1,7 +1,5 @@
 using System;
 using UIModule.Adapters;
-using UIModule.Core;
-using UIModule.Data;
 using UIModule.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;

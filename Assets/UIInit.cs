@@ -11,7 +11,7 @@ public class UIInit : MonoBehaviour
         RedDotModel.Singleton.Init();
         RedDotManager.Singleton.Init();
         RegisterDynamicRedDot();
-        RedDotManager.Singleton.DoAllRedDotUnitCaculate();
+        RedDotManager.Singleton.DoAllRedDotUnitCalculate();
         UIManager.Instance.ShowPanel(UIPanelType.Main);
     }
 
@@ -48,15 +48,6 @@ public class UIInit : MonoBehaviour
             RedDotModel.Singleton.UnregisterDynamicRedDot(redDotNameStory, characterId);
             string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, characterId);
             RedDotModel.Singleton.UnregisterDynamicRedDot(redDotNameCg, characterId);
-        }
-    }
-
-    private void MarkCharacterRedDotDirty()
-    {
-        foreach (var characterId in GetCharacterIds())
-        {
-            RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_STORY_NEW, characterId);
-            RedDotManager.Singleton.MarkRedDotUnitDirty(RedDotUnit.CHARACTER_CG_NEW, characterId);
         }
     }
 

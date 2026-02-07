@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UIModule.Adapters;
-using UIModule.Core;
-using UIModule.Data;
-using UIModule.Data.Models;
 using UIModule.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
@@ -79,20 +76,6 @@ namespace UIModule.Panels
         public void SetCgRedDot(bool show)
         {
             _cgPanelRedDotWidget.gameObject.SetActive(show);
-        }
-
-        public void SetSelectedCharacter(int index)
-        {
-        }
-
-        public void ShowView()
-        {
-             
-        }
-
-        public void HideView()
-        {
-             
         }
 
         public event Action OnCloseClick;

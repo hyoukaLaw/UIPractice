@@ -61,7 +61,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// Note:
     /// 进入游戏后获取完相关数据后触发一次,确保第一次运算结果缓存
     /// </summary>
-    public void DoAllRedDotUnitCaculate()
+    public void DoAllRedDotUnitCalculate()
     {
         var redDotUnitInfoMap = RedDotModel.Singleton.GetRedDotUnitInfoMap();
         // 先算带ID单元，再算普通/聚合单元，保证聚合读取到最新子单元快照。
@@ -293,7 +293,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// </summary>
     public void Update()
     {
-        if(!RedDotModel.Singleton.IsInitCompelte)
+        if(!RedDotModel.Singleton.IsInitComplete)
         {
             return;
         }

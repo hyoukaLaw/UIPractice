@@ -9,8 +9,6 @@ namespace UIModule.Panels
 {
     public class CharacterPanel : BaseUIPanel
     {
-        private string _characterId;
-        private int _level;
         private ICharacterView _characterView;
         private CharacterPanelModel _model;
         private List<ICharacterListItem> _characterListItemUIs = new();
@@ -25,7 +23,7 @@ namespace UIModule.Panels
 
         public override void OnEnter(params object[] args)
         {
-            Log.LogInfo($"CharacterPanel OnEnter: CharacterId={_characterId}, Level={_level}");
+            Log.LogInfo($"CharacterPanel OnEnter");
             
             CharacterConfig characterConfig = Resources.Load<CharacterConfig>($"Config/CharacterConfig");
             _model.SetCharacterConfig(characterConfig);
