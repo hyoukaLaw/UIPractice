@@ -5,7 +5,6 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,7 +67,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         foreach(var redDotUnitInfo in redDotUnitInfoMap)
         {
             if(redDotUnitInfo.Value.SupportIdParameter)
-                DoRedDotUnitCalculateWithId(redDotUnitInfo.Key);
+                RecalculateRedDotUnitRelatedNamesWithId(redDotUnitInfo.Key);
         }
         foreach(var redDotUnitInfo in redDotUnitInfoMap)
         {
@@ -81,6 +80,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// 触发红点名刷新回调
     /// </summary>
     /// <param name="redDotName"></param>
+
     public bool TriggerRedDotNameUpdate(string redDotName)
     {
         var redDotInfo = RedDotModel.Singleton.GetRedDotInfoByName(redDotName);
@@ -113,7 +113,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 批量触发红点名刷新回调
     /// </summary>
-    private void TriggerRedDotNameUpdate(HashSet<string> affectedRedDotNames)
+    private void NotifyRedDotNames(HashSet<string> affectedRedDotNames)
     {
         foreach (var redDotName in affectedRedDotNames)
         {
@@ -124,7 +124,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 批量触发带ID红点名刷新回调
     /// </summary>
-    private void TriggerRedDotNameUpdateWithId(HashSet<string> affectedRedDotNames)
+    private void NotifyRedDotNamesWithId(HashSet<string> affectedRedDotNames)
     {
         foreach (var redDotName in affectedRedDotNames)
         {
@@ -263,11 +263,11 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     }
 
     /// <summary>
-    /// 获取指定红点名结果
+    /// 获取指定红点名缓存结果值
     /// </summary>
     /// <param name="redDotName"></param>
     /// <returns></returns>
-    public int GetRedDotResult(string redDotName)
+    public int GetRedDotNameResultValue(string redDotName)
     {
         int result = RedDotModel.Singleton.GetRedDotNameResult(redDotName);
         if (result != 0)
@@ -301,8 +301,8 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         if(_framePassed >= _dirtyUpdateIntervalFrame)
         {
             // 先处理带ID叶子单元，再处理非ID/聚合单元，确保聚合读取的是最新子结果。
-            ProcessDirtyRedDotUnitWithId();
-            ProcessDirtyRedDotUnit();
+            ProcessDirtyRedDotUnitsWithId();
+            ProcessDirtyRedDotUnitsWithoutId();
             _framePassed = 0;
         }
     }
@@ -366,11 +366,11 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 处理非ID红点运算单元的标脏与刷新
     /// </summary>
-    private void ProcessDirtyRedDotUnit()
+    private void ProcessDirtyRedDotUnitsWithoutId()
     {
         var affectedRedDotNames = CollectAffectedRedDotNames();
         _dirtyRedDotUnitSet.Clear();
-        TriggerRedDotNameUpdate(affectedRedDotNames);
+        NotifyRedDotNames(affectedRedDotNames);
     }
 
     /// <summary>
@@ -378,7 +378,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// </summary>
     private HashSet<string> CollectAffectedRedDotNames()
     {
-        var calculatedRedDotUnitResultChangeMap = new Dictionary<RedDotUnit, bool>();
+        var calculatedRedDotUnitSet = new HashSet<RedDotUnit>();
         var affectedRedDotNames = new HashSet<string>();
         foreach(var dirtyRedDotUnit in _dirtyRedDotUnitSet)
         {
@@ -389,7 +389,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
             }
             foreach (var redDotName in redDotNameList)
             {
-                RecalculateRedDotNameUnits(redDotName, calculatedRedDotUnitResultChangeMap);
+                RecalculateRedDotNameUnits(redDotName, calculatedRedDotUnitSet);
                 affectedRedDotNames.Add(redDotName);
             }
         }
@@ -399,10 +399,10 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 处理带ID红点运算单元的标脏与刷新
     /// </summary>
-    private void ProcessDirtyRedDotUnitWithId()
+    private void ProcessDirtyRedDotUnitsWithId()
     {
         var affectedRedDotNames = CollectAffectedRedDotNamesWithId();
-        TriggerRedDotNameUpdateWithId(affectedRedDotNames);
+        NotifyRedDotNamesWithId(affectedRedDotNames);
         _dirtyRedDotUnitWithId.Clear();
     }
 
@@ -424,7 +424,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
             foreach (var nmWithId in names)
             {
                 var nm = nmWithId.RedDotName;
-                DoRedDotNameCalculateWithId(nm, id);
+                RecalculateRedDotNameWithId(nm, id);
                 affectedRedDotNames.Add(nm);
             }
         }
@@ -434,7 +434,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 重算指定红点名关联的所有运算单元
     /// </summary>
-    private void RecalculateRedDotNameUnits(string redDotName, Dictionary<RedDotUnit, bool> calculatedRedDotUnitResultChangeMap)
+    private void RecalculateRedDotNameUnits(string redDotName, HashSet<RedDotUnit> calculatedRedDotUnitSet)
     {
         var redDotUnitList = RedDotModel.Singleton.GetRedDotUnitsByName(redDotName);
         if(redDotUnitList == null || redDotUnitList.Count == 0)
@@ -443,21 +443,20 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         }
         foreach(var redDotUnit in redDotUnitList)
         {
-            if(calculatedRedDotUnitResultChangeMap.ContainsKey(redDotUnit))
+            if(calculatedRedDotUnitSet.Contains(redDotUnit))
             {
                 continue;
             }
-            var resultChange = DoRedDotUnitCalculate(redDotUnit);
-            calculatedRedDotUnitResultChangeMap.Add(redDotUnit, resultChange);
+            DoRedDotUnitCalculate(redDotUnit);
+            calculatedRedDotUnitSet.Add(redDotUnit);
         }
     }
 
     /// <summary>
-    /// 计算指定非ID红点运算单元并返回结果是否变化
+    /// 计算指定非ID红点运算单元并回写结果缓存
     /// </summary>
-    private bool DoRedDotUnitCalculate(RedDotUnit redDotUnit)
+    private void DoRedDotUnitCalculate(RedDotUnit redDotUnit)
     {
-        var preResult = RedDotModel.Singleton.GetRedDotUnitResult(redDotUnit);
         var redDotUnitInfo = RedDotModel.Singleton.GetRedDotUnitInfo(redDotUnit);
         var result = 0;
         if(redDotUnitInfo != null && redDotUnitInfo.CalculateMode == RedDotUnitCalculateMode.COMPOSITE)
@@ -477,7 +476,6 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
             }
         }
         RedDotModel.Singleton.SetRedDotUnitResult(redDotUnit, result);
-        return preResult != result;
     }
 
     /// <summary>
@@ -535,14 +533,14 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// <summary>
     /// 按红点名逐个重算带ID红点运算单元缓存
     /// </summary>
-    private void DoRedDotUnitCalculateWithId(RedDotUnit redDotUnit)
+    private void RecalculateRedDotUnitRelatedNamesWithId(RedDotUnit redDotUnit)
     {
-        var reddotNameList = RedDotModel.Singleton.GetRedDotNamesByUnit(redDotUnit);
-        if(reddotNameList == null || reddotNameList.Count == 0)
+        var redDotNameList = RedDotModel.Singleton.GetRedDotNamesByUnit(redDotUnit);
+        if(redDotNameList == null || redDotNameList.Count == 0)
         {
-            return ;
+            return;
         }
-        foreach(var redDotName in reddotNameList)
+        foreach(var redDotName in redDotNameList)
         {
             var redDotInfo = RedDotModel.Singleton.GetRedDotInfoByName(redDotName);
             if (redDotInfo == null)
@@ -550,15 +548,14 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
                 continue;
             }
             var id = redDotInfo.IsIdBased ? redDotInfo.Id : 0;
-            DoRedDotNameCalculateWithId(redDotName, id);
+            RecalculateRedDotNameWithId(redDotName, id);
         }
-        return ;
     }
 
     /// <summary>
     /// 计算带ID红点名结果并回写单元与红点名缓存
     /// </summary>
-    private bool DoRedDotNameCalculateWithId(string redDotName, int id)  // redDotName是包含Id的完整红点名
+    private bool RecalculateRedDotNameWithId(string redDotName, int id)
     {
         var redDotUnitList = RedDotModel.Singleton.GetRedDotUnitsByName(redDotName);
         if (redDotUnitList == null || redDotUnitList.Count == 0)

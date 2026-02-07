@@ -186,7 +186,7 @@ public class RedDotEditorWindow : EditorWindow
         if(isTail)
         {
             var redDotInfo = RedDotModel.Singleton.GetRedDotInfoByName(redDotName);
-            redDotNodeResult = RedDotManager.Singleton.GetRedDotResult(redDotName);
+            redDotNodeResult = RedDotManager.Singleton.GetRedDotNameResultValue(redDotName);
             redDotDisplayName = $"{redDotDisplayName}({redDotInfo.RedDotDes})({redDotNodeResult})";
         }
         var preColor = GUI.color;
@@ -336,7 +336,7 @@ public class RedDotEditorWindow : EditorWindow
     private void DrawRedDotInfo(RedDotInfo redDotInfo)
     {
         EditorGUILayout.LabelField($"当前选择红点", RedDotStyles.ButtonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
-        var redDotNameResult = RedDotManager.Singleton.GetRedDotResult(redDotInfo.RedDotName);
+        var redDotNameResult = RedDotManager.Singleton.GetRedDotNameResultValue(redDotInfo.RedDotName);
         EditorGUILayout.LabelField($"{redDotInfo.RedDotName}({redDotInfo.RedDotDes})({redDotNameResult})", RedDotStyles.ButtonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
         EditorGUILayout.BeginVertical("box");
         EditorGUILayout.LabelField($"红点运算单元组合", RedDotStyles.ButtonMidStyle, GUILayout.ExpandWidth(true), GUILayout.Height(20f));
