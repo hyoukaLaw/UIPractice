@@ -170,7 +170,7 @@ public static class RedDotUtilities
         int result = 0;
         foreach (var data in InitialData.Singleton.CharacterConfig.GetCharacters())
         {
-            if (data.GetIsNewCharacter())
+            if (data.GetHasNewStory() || data.GetHasNewCg())
             {
                 result++;
                 break;
@@ -182,8 +182,22 @@ public static class RedDotUtilities
     public static int CalculateCharacterStoryNew(int characterId)
     {
         var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
-        return characterData.GetIsNewCharacter() ? 1 : 0;
+        return characterData.GetHasNewStory() ? 1 : 0;
     }
+
+    public static int CalculateCharacterCgNew(int characterId)
+    {
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        return characterData.GetHasNewCg() ? 1 : 0;
+    }
+
+    public static int CalculateCharacterNew(int characterId)
+    {
+        var characterData = InitialData.Singleton.CharacterConfig.GetCharacterById(characterId.ToString());
+        return characterData.GetHasNewCg() || characterData.GetHasNewStory() ? 1 : 0;
+    }
+    
+    
     
     #endregion
     

@@ -19,7 +19,9 @@ namespace UIModule.Data.Models
         [SerializeField]
         private Sprite _portraitSprite;
         [SerializeField] 
-        private bool _isNewCharacter;
+        private bool _hasNewStory;
+        [SerializeField] 
+        private bool _hasNewCg;
 
         public string GetId()
         {
@@ -81,14 +83,19 @@ namespace UIModule.Data.Models
             _portraitSprite = sprite;
         }
         
-        public bool GetIsNewCharacter()
+        public bool GetHasNewStory()
         {
-            return _isNewCharacter;
+            return _hasNewStory;
         }
         
-        public void SetIsNewCharacter(bool isNewCharacter)
+        public void SetHasNewStory(bool isNewCharacter)
         {
-            _isNewCharacter = isNewCharacter;
+            _hasNewStory = isNewCharacter;
+        }
+        
+        public bool GetHasNewCg()
+        {
+            return _hasNewCg;
         }
     }
 }

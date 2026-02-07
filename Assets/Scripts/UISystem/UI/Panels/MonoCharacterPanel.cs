@@ -26,6 +26,9 @@ namespace UIModule.Panels
         private Button _storyPanelButton;
         
         [SerializeField]
+        private RedDotWidget _storyPanelRedDotWidget;
+        
+        [SerializeField]
         private Button _cgPanelButton;
 
         [SerializeField] 
@@ -63,7 +66,11 @@ namespace UIModule.Panels
                 characterListItem.transform.SetParent(_characterListContent.transform, false);
                 
             }
+        }
 
+        public void SetStoryRedDot(bool show)
+        {
+            _storyPanelRedDotWidget.gameObject.SetActive(show);
         }
 
         public void SetSelectedCharacter(int index)

@@ -10,6 +10,7 @@ namespace UIModule.Interfaces
         void SetCharacterName(string name);
         void SetLevel(int level);
         void SetCharacterList(List<GameObject> characterList);
+        void SetStoryRedDot(bool show);
         void SetSelectedCharacter(int index);
         void ShowView();
         void HideView();

@@ -100,7 +100,8 @@ public static class RedDotNames
     #endregion
 
     #region ID-based红点模板
-    public const string CHARACTER_STORY_TEMPLATE = "CHARACTER|STORY|{0}";
+    public const string CHARACTER_ID_TEMPLATE = "CHARACTER|{0}";
+    public const string CHARACTER_STORY_ID_TEMPLATE = "CHARACTER|STORY|{0}";
     public const string EQUIPMENT_UPGRADEABLE_TEMPLATE = "EQUIPMENT|UPGRADEABLE|{0}";
     public const string MAIL_REWARD_TEMPLATE = "MAIL|REWARD|{0}";
     #endregion

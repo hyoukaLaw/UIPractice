@@ -37,6 +37,8 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
 
     private Dictionary<string, int> mRedDotNameResultMap;
 
+    private Dictionary<RedDotUnit, List<int>> _redDotUnitToIdListMap;
+
     public Trie RedDotTrie
     {
         get;
@@ -62,6 +64,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         mRedDotInfoMap = new Dictionary<string, RedDotInfo>();
         mRedDotUnitNameMap = new Dictionary<RedDotUnit, List<string>>();
         mRedDotNameResultMap = new Dictionary<string, int>();
+        _redDotUnitToIdListMap = new Dictionary<RedDotUnit, List<int>>();
         IsInitCompelte = false;
     }
 
@@ -101,8 +104,11 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         AddRedDotUnitInfo(RedDotUnit.BATTLE_MAIL_REWARD_NUM, "战斗邮件可领奖数", RedDotUtilities.CaculateNewBattleMailRewardNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.WEARABLE_EQUIP_NUM, "可穿戴装备数", RedDotUtilities.CaculateWearableEquipNum, RedDotType.NUMBER);
         AddRedDotUnitInfo(RedDotUnit.UPGRADEABLE_EQUIP_NUM, "可升级装备数", RedDotUtilities.CaculateUpgradeableEquipNum, RedDotType.NUMBER);
-        AddRedDotUnitInfo(RedDotUnit.CHARACTER_NEW, "新人物", RedDotUtilities.CalculateCharacterNew, RedDotType.NEW);
-        AddRedDotUnitInfoWithId(RedDotUnit.CHARACTER_STORY_NEW, "新人物故事", RedDotUtilities.CalculateCharacterStoryNew, RedDotType.NEW);
+        AddRedDotUnitInfo(RedDotUnit.MAIN_UI_CHARACTER_NEW, "新人物", RedDotUtilities.CalculateCharacterNew, RedDotType.NEW);
+        AddRedDotUnitInfoWithId(RedDotUnit.CHARACTER_STORY_NEW, "人物新故事", RedDotUtilities.CalculateCharacterStoryNew, RedDotType.NEW);
+        AddRedDotUnitInfoWithId(RedDotUnit.CHARACTER_CG_NEW, "人物新Cg", RedDotUtilities.CalculateCharacterCgNew, RedDotType.NEW);
+        // 可以强行给MAIN_CHARACTER_NEW配置不带int参数的版本，但本质上就不是理想的聚合方式了，除非配置每个红点名字模板对应的ID数量，可以实现接洽
+        //AddRedDotUnitInfoWithId(RedDotUnit.CHARACTER_NEW, "人物有新东西", RedDotUtilities.CalculateCharacterNew, RedDotType.NEW);
     }
 
     /// <summary>
@@ -152,7 +158,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         redDotInfo.AddRedDotUnit(RedDotUnit.NEW_RESOURCE_NUM);
 
         redDotInfo = AddRedDotInfo(RedDotNames.MAIN_UI_CHARACTER, "主界面人物红点");
-        redDotInfo.AddRedDotUnit(RedDotUnit.CHARACTER_NEW);
+        redDotInfo.AddRedDotUnit(RedDotUnit.MAIN_UI_CHARACTER_NEW);
     }
 
     /// <summary>
@@ -421,7 +427,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         return true;
     }
 
-    public RedDotInfo RegisterDynamicRedDot(string redDotName, string redDotDes, RedDotUnit redDotUnit)
+    public RedDotInfo RegisterDynamicRedDot(int id, string redDotName, string redDotDes, RedDotUnit redDotUnit)
     {
         if (mRedDotInfoMap.ContainsKey(redDotName))
         {
@@ -437,6 +443,33 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
             mRedDotUnitNameMap.Add(redDotUnit, new List<string>());
         }
         mRedDotUnitNameMap[redDotUnit].Add(redDotName);
+        if (!_redDotUnitToIdListMap.ContainsKey(redDotUnit))
+        {
+            _redDotUnitToIdListMap.Add(redDotUnit, new List<int>());
+        }
+        _redDotUnitToIdListMap[redDotUnit].Add(id);
+        return redDotInfo;
+    }
+
+    public RedDotInfo RegisterDynamicRedDot(string redDotName, string redDotDes, List<RedDotUnit> redDotUnitList)
+    {
+        if (mRedDotInfoMap.ContainsKey(redDotName))
+        {
+            Debug.LogWarning($"红点名:{redDotName}已存在，跳过注册!");
+            return mRedDotInfoMap[redDotName];
+        }
+        var redDotInfo = new RedDotInfo(redDotName, redDotDes);
+        foreach (var redDotUnit in redDotUnitList)
+        {
+            redDotInfo.AddRedDotUnit(redDotUnit);
+            if (!mRedDotUnitNameMap.ContainsKey(redDotUnit))
+            {
+                mRedDotUnitNameMap.Add(redDotUnit, new List<string>());
+            }
+            mRedDotUnitNameMap[redDotUnit].Add(redDotName);
+        }
+        mRedDotInfoMap.Add(redDotName, redDotInfo);
+        RedDotTrie.AddWord(redDotName);
         return redDotInfo;
     }
 

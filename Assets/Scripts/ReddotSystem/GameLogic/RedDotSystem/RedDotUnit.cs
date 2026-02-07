@@ -20,6 +20,7 @@ public enum RedDotUnit
     #region 主UI部分
     NEW_FUNC1,                              // 动态新功能1解锁
     NEW_FUNC2,                              // 动态新功能2解锁
+    MAIN_UI_CHARACTER_NEW,
     #endregion
     #region 背包部分
     NEW_ITEM_NUM,                           // 新道具数
@@ -39,7 +40,8 @@ public enum RedDotUnit
     #endregion
     #region 人物部分
     CHARACTER_NEW,
-    CHARACTER_STORY_NEW
+    CHARACTER_STORY_NEW,
+    CHARACTER_CG_NEW,
     #endregion
 }
 

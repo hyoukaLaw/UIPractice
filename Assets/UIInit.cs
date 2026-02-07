@@ -27,9 +27,11 @@ public class UIInit : MonoBehaviour
         RedDotManager.Singleton.Update();
         for (int i = 0; i < 4; i++)
         {
-            string redDotName = string.Format(RedDotNames.CHARACTER_STORY_TEMPLATE, i);
+            string redDotName = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, i);
             //RedDotModel.Singleton.RegisterDynamicRedDot(redDotName, $"角色{i}故事红点", RedDotUnit.CHARACTER_STORY_NEW);
             RedDotManager.Singleton.MarkRedDotNameDirty(redDotName);
+            string redDotNameCharacter = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, i);
+            RedDotManager.Singleton.MarkRedDotNameDirty(redDotNameCharacter);
         }
     }
 
@@ -42,8 +44,10 @@ public class UIInit : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            string redDotName = string.Format(RedDotNames.CHARACTER_STORY_TEMPLATE, i);
-            RedDotModel.Singleton.RegisterDynamicRedDot(redDotName, $"角色{i}故事红点", RedDotUnit.CHARACTER_STORY_NEW);
+            string redDotNameCharacter = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, i);
+            RedDotModel.Singleton.RegisterDynamicRedDot(redDotNameCharacter, $"角色{i}红点", new List<RedDotUnit>(){RedDotUnit.CHARACTER_STORY_NEW,RedDotUnit.CHARACTER_CG_NEW});
+            string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, i);
+            RedDotModel.Singleton.RegisterDynamicRedDot(i, redDotNameStory, $"角色{i}故事红点", RedDotUnit.CHARACTER_STORY_NEW);
         }
     }
     
@@ -51,8 +55,10 @@ public class UIInit : MonoBehaviour
     {
         for (int i = 0; i < 4; i++)
         {
-            string redDotName = string.Format(RedDotNames.CHARACTER_STORY_TEMPLATE, i);
-            RedDotModel.Singleton.UnregisterDynamicRedDot(redDotName);
+            string redDotNameCharacter = string.Format(RedDotNames.CHARACTER_ID_TEMPLATE, i);
+            RedDotModel.Singleton.UnregisterDynamicRedDot(redDotNameCharacter);
+            string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, i);
+            RedDotModel.Singleton.UnregisterDynamicRedDot(redDotNameStory);
         }
     }
 }

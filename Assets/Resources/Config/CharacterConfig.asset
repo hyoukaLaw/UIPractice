@@ -19,25 +19,29 @@ MonoBehaviour:
     _level: 0
     _avatarSprite: {fileID: 21300000, guid: 6bed446bcdb24f94caf8f6db46a2070e, type: 3}
     _portraitSprite: {fileID: 0}
-    _isNewCharacter: 0
+    _hasNewStory: 0
+    _hasNewCg: 1
   - _id: 1
     _name: "\u85E4\u7530 \u7434\u97F3"
     _title: 
     _level: 0
     _avatarSprite: {fileID: 21300000, guid: 2f1ee2f015e84e74882732ab91768aa9, type: 3}
     _portraitSprite: {fileID: 0}
-    _isNewCharacter: 0
+    _hasNewStory: 0
+    _hasNewCg: 0
   - _id: 2
     _name: "\u8D64\u57CE \u9633\u83DC"
     _title: 
     _level: 0
     _avatarSprite: {fileID: 21300000, guid: 9578cd070c72fb642a844632eae5f58f, type: 3}
     _portraitSprite: {fileID: 0}
-    _isNewCharacter: 0
+    _hasNewStory: 1
+    _hasNewCg: 0
   - _id: 3
     _name: "\u795E\u5D0E \u9065\u4EBA"
     _title: 
     _level: 0
     _avatarSprite: {fileID: 21300000, guid: 66bd362f5143fda42a6a4d8420625408, type: 3}
     _portraitSprite: {fileID: 0}
-    _isNewCharacter: 1
+    _hasNewStory: 0
+    _hasNewCg: 0
