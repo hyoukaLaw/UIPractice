@@ -14,7 +14,7 @@ using UnityEngine;
 /// Note:
 /// 游戏里的红点运算单元按最小单位定义，所有红点的影响因素通过红点运算单元组装而成
 /// </summary>
-public enum RedDotUnit
+public enum RedDotUnit // 好的实现应该是允许reddotunit内部进一步组合
 {
     INVALIDE = 0,                           // 无效类型
     #region 主UI部分

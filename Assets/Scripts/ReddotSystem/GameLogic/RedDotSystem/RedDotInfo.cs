@@ -33,6 +33,9 @@ public class RedDotInfo // 关联红点名，红点运算单元和UI刷新回调
         private set;
     }
     
+    public int Id { get; set; }
+    public bool IsIdBased { get; set; }
+    
     /// <summary>
     /// 红点描述
     /// </summary>
@@ -66,6 +69,12 @@ public class RedDotInfo // 关联红点名，红点运算单元和UI刷新回调
         RedDotName = redDotName;
         RedDotDes = redDotDes;
         RedDotUnitList = new List<RedDotUnit>();
+    }
+
+    public RedDotInfo(string redDotName, string redDotDes, int id) : this(redDotName, redDotDes)
+    {
+        Id = id;
+        IsIdBased = true;
     }
 
     /// <summary>

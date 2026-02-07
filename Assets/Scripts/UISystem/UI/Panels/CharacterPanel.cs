@@ -46,6 +46,9 @@ namespace UIModule.Panels
 
                 string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.BindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
+                
+                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.BindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
             }
             _characterView.SetCharacterList(characterListItems);
             SelectCharacter(0);
@@ -93,6 +96,9 @@ namespace UIModule.Panels
                 
                 string redDotNameStory = string.Format(RedDotNames.CHARACTER_STORY_ID_TEMPLATE, item.GetId());
                 RedDotManager.Singleton.UnbindRedDotName(redDotNameStory, RefreshCharacterStoryRedDot);
+
+                string redDotNameCg = string.Format(RedDotNames.CHARACTER_CG_ID_TEMPLATE, item.GetId());
+                RedDotManager.Singleton.UnbindRedDotName(redDotNameCg, RefreshCharacterCgRedDot);
             }
         }
 
@@ -150,6 +156,20 @@ namespace UIModule.Panels
             if (_model.GetSelectedIndex() == characterId)
             {
                 _characterView.SetStoryRedDot(result > 0);
+            }
+        }
+        
+        private void RefreshCharacterCgRedDot(string redDotName, int result, RedDotType redDotType)
+        {
+            int characterId;
+            if (!TryParseRedDotNameId(redDotName, out characterId))
+            {
+                return;
+            }
+
+            if (_model.GetSelectedIndex() == characterId)
+            {
+                _characterView.SetCgRedDot(result > 0);
             }
         }
         

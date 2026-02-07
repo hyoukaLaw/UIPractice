@@ -20,7 +20,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     /// </summary>
     private Dictionary<RedDotUnit, RedDotUnit> mDirtyRedDotUnitMap;
 
-    private Dictionary<string, string> mDirtyRedDotNameWithIdMap; // 标记脏的ID红点名
+    private HashSet<RedDotUnitWithId> _dirtyRedDotUnitWithId = new(); // 标记脏的带Id的红点计算单元
 
     private Dictionary<RedDotUnit, bool> mCaculatedRedDotUnitResultChangeMap; // 脏的红点单元，重新计算后结果确实有变化，存进这个容器
 
@@ -54,7 +54,6 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
     {
         mDirtyRedDotUnitMap = new Dictionary<RedDotUnit, RedDotUnit>();
         mCaculatedRedDotUnitResultChangeMap = new Dictionary<RedDotUnit, bool>();
-        mDirtyRedDotNameWithIdMap = new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -175,29 +174,6 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         return redDotNameResult;
     }
 
-    private bool TryParseRedDotNameId(string redDotName, out int id)
-    {
-        id = 0;
-        if (string.IsNullOrEmpty(redDotName))
-        {
-            return false;
-        }
-        var parts = redDotName.Split('|');
-        if (parts.Length < 2)
-        {
-            return false;
-        }
-        return int.TryParse(parts[parts.Length - 1], out id);
-    }
-
-    public void MarkRedDotNameDirty(string redDotName)
-    {
-        if (!mDirtyRedDotNameWithIdMap.ContainsKey(redDotName))
-        {
-            mDirtyRedDotNameWithIdMap.Add(redDotName, redDotName);
-        }
-    }
-
     /// <summary>
     /// 绑定指定红点名刷新回调
     /// </summary>
@@ -271,7 +247,7 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         if(mFramePassed >= DIRTY_UPDATE_INTERVAL_FRAME)
         {
             CheckDirtyRedDotUnit();
-            CheckDirtyRedDotNameWithId();
+            CheckDirtyRedDotUnitWithId();
             mFramePassed = 0;
         }
     }
@@ -286,6 +262,12 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         {
             mDirtyRedDotUnitMap.Add(redDotUnit, redDotUnit);
         }
+    }
+
+    public void MarkRedDotUnitDirty(RedDotUnit redDotUnit, int id)
+    {
+        if(!_dirtyRedDotUnitWithId.Contains(new RedDotUnitWithId(redDotUnit, id)))
+             _dirtyRedDotUnitWithId.Add(new RedDotUnitWithId(redDotUnit, id));
     }
 
     /// <summary>
@@ -338,24 +320,26 @@ public class RedDotManager : SingletonTemplate<RedDotManager>
         }
         return resultChangedRedDotNameMap;
     }
-    
-    private void CheckDirtyRedDotNameWithId()
+
+    private void CheckDirtyRedDotUnitWithId()
     {
         var resultChangedRedDotNameMap = new Dictionary<string, string>();
-        foreach (var dirtyRedDotName in mDirtyRedDotNameWithIdMap)
+        foreach (var dirtyRedDotUnitWithId in _dirtyRedDotUnitWithId)
         {
-            int id;
-            if (TryParseRedDotNameId(dirtyRedDotName.Key, out id))
+            var redDotUnit = dirtyRedDotUnitWithId.RedDotUnit;
+            var id = dirtyRedDotUnitWithId.Id;
             {
-                DoRedDotNameCalculateWithId(dirtyRedDotName.Key, id);
-                if(!resultChangedRedDotNameMap.ContainsKey(dirtyRedDotName.Key))
+                var names = RedDotModel.Singleton.GetRedDotNameByUnitWithId(redDotUnit, id);
+                foreach (var nmWithId in names)
                 {
-                    resultChangedRedDotNameMap.Add(dirtyRedDotName.Key, dirtyRedDotName.Key);
+                    string nm = nmWithId.RedDotName;
+                    DoRedDotNameCalculateWithId(nm, id);
+                    resultChangedRedDotNameMap.TryAdd(nm, nm);
                 }
             }
         }
-        mDirtyRedDotNameWithIdMap.Clear();
         TriggerRedDotNameUpdateWithId(resultChangedRedDotNameMap);
+        _dirtyRedDotUnitWithId.Clear();
     }
 
     private bool DoRedDotUnitCalculate(RedDotUnit redDotUnit)

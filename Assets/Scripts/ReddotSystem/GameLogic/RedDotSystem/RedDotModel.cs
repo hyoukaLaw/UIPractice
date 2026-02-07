@@ -9,6 +9,69 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class RedDotNameWithId : IEquatable<RedDotNameWithId>
+{
+    public string RedDotName;
+    public int Id;
+
+    public RedDotNameWithId(string redDotName, int id)
+    {
+        RedDotName = redDotName;
+        Id = id;
+    }
+
+    public bool Equals(RedDotNameWithId other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return RedDotName == other.RedDotName && Id == other.Id;
+    }
+    
+    public override bool Equals(object obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((RedDotUnitWithId)obj);
+    }
+    
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(RedDotName, Id);
+    }
+}
+
+public class RedDotUnitWithId: IEquatable<RedDotUnitWithId>
+{
+    public RedDotUnit RedDotUnit;
+    public int Id;
+
+    public RedDotUnitWithId(RedDotUnit redDotUnit, int id)
+    {
+        RedDotUnit = redDotUnit;
+        Id = id;
+    }
+
+    public bool Equals(RedDotUnitWithId other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return RedDotUnit == other.RedDotUnit && Id == other.Id;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((RedDotUnitWithId)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine((int)RedDotUnit, Id);
+    }
+}
 /// <summary>
 /// RedDotModel.cs
 /// 红点数据单例类
@@ -37,7 +100,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
 
     private Dictionary<string, int> mRedDotNameResultMap;
 
-    private Dictionary<RedDotUnit, List<int>> _redDotUnitToIdListMap;
+    private Dictionary<RedDotUnitWithId, List<RedDotNameWithId>> _redDotUnitWithIdMap = new();
 
     public Trie RedDotTrie
     {
@@ -64,7 +127,6 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         mRedDotInfoMap = new Dictionary<string, RedDotInfo>();
         mRedDotUnitNameMap = new Dictionary<RedDotUnit, List<string>>();
         mRedDotNameResultMap = new Dictionary<string, int>();
-        _redDotUnitToIdListMap = new Dictionary<RedDotUnit, List<int>>();
         IsInitCompelte = false;
     }
 
@@ -396,6 +458,16 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
         return redDotNames;
     }
 
+    public List<RedDotNameWithId> GetRedDotNameByUnitWithId(RedDotUnit redDotUnit, int id)
+    {
+        List<RedDotNameWithId> results;
+        if (!_redDotUnitWithIdMap.TryGetValue(new RedDotUnitWithId(redDotUnit, id), out results))
+        {
+            Debug.LogError($"找不到红点运算单元:{redDotUnit.ToString()}的影响红点名信息，获取失败！");
+        }
+        return results;
+    }
+
     /// <summary>
     /// 获取指定红点运算单元的运算结果
     /// </summary>
@@ -434,7 +506,7 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
             Debug.LogWarning($"红点名:{redDotName}已存在，跳过注册!");
             return mRedDotInfoMap[redDotName];
         }
-        var redDotInfo = new RedDotInfo(redDotName, redDotDes);
+        var redDotInfo = new RedDotInfo(redDotName, redDotDes, id);
         redDotInfo.AddRedDotUnit(redDotUnit);
         mRedDotInfoMap.Add(redDotName, redDotInfo);
         RedDotTrie.AddWord(redDotName);
@@ -443,22 +515,24 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
             mRedDotUnitNameMap.Add(redDotUnit, new List<string>());
         }
         mRedDotUnitNameMap[redDotUnit].Add(redDotName);
-        if (!_redDotUnitToIdListMap.ContainsKey(redDotUnit))
+        if (!_redDotUnitWithIdMap.ContainsKey(new RedDotUnitWithId(redDotUnit, id)))
         {
-            _redDotUnitToIdListMap.Add(redDotUnit, new List<int>());
+            _redDotUnitWithIdMap.Add(new RedDotUnitWithId(redDotUnit, id), new List<RedDotNameWithId>());
         }
-        _redDotUnitToIdListMap[redDotUnit].Add(id);
+        _redDotUnitWithIdMap[new RedDotUnitWithId(redDotUnit, id)].Add(new RedDotNameWithId(redDotName, id));
         return redDotInfo;
     }
 
-    public RedDotInfo RegisterDynamicRedDot(string redDotName, string redDotDes, List<RedDotUnit> redDotUnitList)
+    public RedDotInfo RegisterDynamicRedDot(int id, string redDotName, string redDotDes, List<RedDotUnit> redDotUnitList)
     {
         if (mRedDotInfoMap.ContainsKey(redDotName))
         {
             Debug.LogWarning($"红点名:{redDotName}已存在，跳过注册!");
             return mRedDotInfoMap[redDotName];
         }
-        var redDotInfo = new RedDotInfo(redDotName, redDotDes);
+        var redDotInfo = new RedDotInfo(redDotName, redDotDes, id);
+        mRedDotInfoMap.Add(redDotName, redDotInfo);
+        RedDotTrie.AddWord(redDotName);
         foreach (var redDotUnit in redDotUnitList)
         {
             redDotInfo.AddRedDotUnit(redDotUnit);
@@ -467,13 +541,17 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
                 mRedDotUnitNameMap.Add(redDotUnit, new List<string>());
             }
             mRedDotUnitNameMap[redDotUnit].Add(redDotName);
+            if (!_redDotUnitWithIdMap.ContainsKey(new RedDotUnitWithId(redDotUnit, id)))
+            {
+                _redDotUnitWithIdMap.Add(new RedDotUnitWithId(redDotUnit, id), new List<RedDotNameWithId>());
+            }
+            _redDotUnitWithIdMap[new RedDotUnitWithId(redDotUnit, id)].Add(new RedDotNameWithId(redDotName, id));
         }
-        mRedDotInfoMap.Add(redDotName, redDotInfo);
-        RedDotTrie.AddWord(redDotName);
+
         return redDotInfo;
     }
 
-    public void UnregisterDynamicRedDot(string redDotName)
+    public void UnregisterDynamicRedDot(string redDotName, int id)
     {
         if (!mRedDotInfoMap.ContainsKey(redDotName))
         {
@@ -486,6 +564,11 @@ public class RedDotModel : SingletonTemplate<RedDotModel>
             if (mRedDotUnitNameMap.ContainsKey(redDotUnit))
             {
                 mRedDotUnitNameMap[redDotUnit].Remove(redDotName);
+            }
+
+            if (_redDotUnitWithIdMap.ContainsKey(new RedDotUnitWithId(redDotUnit, id)))
+            {
+                _redDotUnitWithIdMap[new RedDotUnitWithId(redDotUnit, id)].Remove(new RedDotNameWithId(redDotName, id));
             }
         }
         mRedDotNameResultMap.Remove(redDotName);
