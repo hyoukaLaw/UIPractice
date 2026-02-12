@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UIModule.Data.Models;
 using UIModule.Data;
 using UIModule.Adapters;
@@ -27,9 +28,15 @@ namespace UIModule.Core
         private readonly Dictionary<UIPanelType, BaseUIPanel> _activePanels = new Dictionary<UIPanelType, BaseUIPanel>();
         private readonly Dictionary<UIPanelType, MonoPanel> _activeMonoPanels = new Dictionary<UIPanelType, MonoPanel>();
         private readonly Dictionary<UIPanelType, BasePanelModel> _activePanelModels = new Dictionary<UIPanelType, BasePanelModel>();
+        private TMP_FontAsset _dynamicFontAsset;
 
         private UIManager()
         {
+        }
+
+        public void SetDynamicFontAsset(TMP_FontAsset fontAsset)
+        {
+            _dynamicFontAsset = fontAsset;
         }
 
         public void ShowPanel(UIPanelType type, params object[] args)
@@ -61,6 +68,7 @@ namespace UIModule.Core
             UIAssetLoader.Destroy(context.MonoPanel.gameObject);
             HideModalBackgroundIfNeeded(context.Config);
             ResumeTopPanelIfNeeded();
+            UnloadDynamicFontAsset();
         }
 
         public void HideTopPanel()
@@ -159,6 +167,11 @@ namespace UIModule.Core
             {
                 topPanel.OnResume();
             }
+        }
+
+        private void UnloadDynamicFontAsset()
+        {
+            _dynamicFontAsset?.ClearFontAssetData();
         }
 
         private bool IsPanelActive(UIPanelType type)

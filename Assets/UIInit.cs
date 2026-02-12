@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UIModule.Core;
 using UIModule.Core.UISystem;
 using UIModule.Data;
@@ -6,12 +7,14 @@ using UnityEngine;
 
 public class UIInit : MonoBehaviour
 {
+    public TMP_FontAsset DynamicAsset;
     void Start()
     {
         RedDotModel.Singleton.Init();
         RedDotManager.Singleton.Init();
         RegisterDynamicRedDot();
         RedDotManager.Singleton.DoAllRedDotUnitCalculate();
+        UIManager.Instance.SetDynamicFontAsset(DynamicAsset);
         UIManager.Instance.ShowPanel(UIPanelType.Main);
     }
 
