@@ -7,5 +7,6 @@ namespace UIModule.Panels
         void SetCharacterRedDot(bool show);
         event Action OnCharacterClick;
         event Action OnBagClick;
+        event Action OnBagHorizontalClick;
     }
 }

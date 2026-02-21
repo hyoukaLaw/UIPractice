@@ -22,6 +22,8 @@ namespace UIModule.Panels
          private float _itemWidth = 100f;
          [SerializeField]
          private int _columnCount = 1;
+         [SerializeField]
+         private int _rowCount = 1;
          [SerializeField] 
          private float _paddingTop = 50f;
          [SerializeField] 
@@ -88,8 +90,20 @@ namespace UIModule.Panels
              _itemCount = itemCount;
              _itemHeight = itemHeight;
              _itemWidth = itemWidth;
-             _columnCount = columnCount;
              _scrollType = scrollType;
+             if (_scrollType == ScrollType.Vertical)
+             {
+                 _columnCount = Mathf.Max(1, columnCount);
+             }
+             else
+             {
+                 // Horizontal 模式使用独立行数配置，避免与 Vertical 列数语义耦合。
+                 _rowCount = Mathf.Max(1, columnCount);
+             }
+             _isInitialized = false;
+             _startRowIndex = 0;
+             _startColumnIndex = 0;
+             _lastScrollPosition = 0f;
          }
  
          private void InitializePool()
@@ -111,15 +125,16 @@ namespace UIModule.Panels
             Log.LogInfo($"CalculateVisibleItemCount _viewportHeight:{_viewportHeight}, _viewportWidth:{_viewportWidth}");
             if (_scrollType == ScrollType.Vertical)
             {
-                int rowCount = Mathf.CeilToInt(_viewportHeight / (_itemHeight+_spaceVertical) ) + 2;
-                _visibleItemCount = rowCount * _columnCount;
+                 int rowCount = Mathf.CeilToInt(_viewportHeight / (_itemHeight+_spaceVertical) ) + 2;
+                 _visibleItemCount = rowCount * _columnCount;
             }
-            else
-            {
-                int columnCountVisible = Mathf.CeilToInt(_viewportWidth / _itemWidth) + 2;
-                int rowCount = Mathf.CeilToInt(_itemCount / (float)_columnCount);
-                _visibleItemCount = columnCountVisible * rowCount;
-            }
+             else
+             {
+                 // Horizontal 模式下使用固定行数 _rowCount 计算可见数量。
+                 int rowCount = Mathf.Max(1, _rowCount);
+                 int columnCountVisible = Mathf.CeilToInt(_viewportWidth / (_itemWidth + _spaceHorizontal)) + 2;
+                 _visibleItemCount = rowCount * columnCountVisible;
+             }
         }
 
         private float GetScrollPosition()
@@ -146,8 +161,9 @@ namespace UIModule.Panels
                 Log.LogInfo($"OnScrollValueChanged viewportWidth:{_viewport.rect.width}");
             }
             float currentPosition = GetScrollPosition();
+            float threshold = _scrollType == ScrollType.Vertical ? _itemHeight * 0.5f : _itemWidth * 0.5f;
 
-            if (Mathf.Abs(currentPosition - _lastScrollPosition) > _itemHeight / 2f)
+            if (Mathf.Abs(currentPosition - _lastScrollPosition) > threshold)
             {
                 _lastScrollPosition = currentPosition;
                 UpdateVisibleItems();
@@ -168,14 +184,19 @@ namespace UIModule.Panels
             }
             else
             {
-                int totalColumns = Mathf.CeilToInt((float)_itemCount / _columnCount);
-                float contentWidth = totalColumns * _itemWidth;
+                int rowCount = Mathf.Max(1, _rowCount);
+                int totalColumns = Mathf.CeilToInt((float)_itemCount / rowCount);
+                float contentWidth = totalColumns * _itemWidth + Mathf.Max(0, totalColumns - 1) * _spaceHorizontal + _paddingLeft;
                 _content.sizeDelta = new Vector2(contentWidth, _content.sizeDelta.y);
             }
         }
 
         private void UpdateVisibleItems()
         {
+            if (_itemCount <= 0)
+            {
+                return;
+            }
             float scrollPosition = GetScrollPosition();
 
             if (_scrollType == ScrollType.Vertical)
@@ -198,11 +219,12 @@ namespace UIModule.Panels
                   {
                       int rowIndex = _startRowIndex + (i / _columnCount);
                       int columnIndex = i % _columnCount;
-                      int dataIndex = (rowIndex * _columnCount + columnIndex) % _itemCount;
-                      if ((rowIndex * _columnCount + columnIndex) < 0 ||
-                          (rowIndex * _columnCount + columnIndex) >= _itemCount)
-                          continue;
-                      UpdateItem(i, rowIndex, columnIndex, dataIndex);
+                       int dataIndex = (rowIndex * _columnCount + columnIndex);
+                       if (dataIndex < 0 || dataIndex >= _itemCount)
+                       {
+                           continue;
+                       }
+                       UpdateItem(i, rowIndex, columnIndex, dataIndex);
                   }
                   _isInitialized = true;
               }
@@ -210,7 +232,8 @@ namespace UIModule.Panels
 
           private void UpdateHorizontalScroll(float scrollPosition)
           {
-              int newStartColumn = Mathf.FloorToInt(scrollPosition / _itemWidth);
+              int newStartColumn = Mathf.FloorToInt(scrollPosition / (_itemWidth + _spaceHorizontal)) - 1;
+              int rowCount = Mathf.Max(1, _rowCount);
 
               if (!_isInitialized || newStartColumn != _startColumnIndex)
               {
@@ -218,9 +241,14 @@ namespace UIModule.Panels
 
                   for (int i = 0; i < _visibleItemCount; i++)
                   {
-                      int columnIndex = _startColumnIndex + (i % _columnCount);
-                      int rowIndex = i / _columnCount;
-                      int dataIndex = (rowIndex * _columnCount + columnIndex) % _itemCount;
+                      // Horizontal 模式按“列优先”映射数据：同一列自上而下填满后再到下一列。
+                      int rowIndex = i % rowCount;
+                      int columnIndex = _startColumnIndex + (i / rowCount);
+                      int dataIndex = columnIndex * rowCount + rowIndex;
+                       if (dataIndex < 0 || dataIndex >= _itemCount)
+                       {
+                          continue;
+                       }
                       UpdateItem(i, rowIndex, columnIndex, dataIndex);
                   }
                   _isInitialized = true;
@@ -236,29 +264,73 @@ namespace UIModule.Panels
              MonoBagListItem item = _itemPool.GetOrCreate(cellIndex);
              if (item != null)
              {
-                 RectTransform rectTransform = item.GetComponent<RectTransform>();
-                 if (rectTransform != null)
-                 {
-                     float leftOffset = GetGridLeftOffset();
-                     Vector2 anchoredPosition = new Vector2(
-                         leftOffset + columnIndex * (_itemWidth + _spaceHorizontal) + _itemWidth / 2f,
-                         -rowIndex * _itemHeight - _itemHeight/2f - _paddingTop - rowIndex * _spaceVertical);
-                     rectTransform.anchoredPosition = anchoredPosition;
-                     Log.LogInfo($"anchoredPosition:{anchoredPosition} cellIndex:{cellIndex} rowIndex:{rowIndex} columnIndex:{columnIndex} dataIndex:{dataIndex}");
-                 }
-                 _itemPool.UpdateItemData(cellIndex, dataIndex);
-             }
+                  RectTransform rectTransform = item.GetComponent<RectTransform>();
+                  if (rectTransform != null)
+                  {
+                      float leftOffset = GetGridLeftOffset();
+                      float topOffset = GetGridTopOffset();
+                      Vector2 anchoredPosition = new Vector2(
+                          leftOffset + columnIndex * (_itemWidth + _spaceHorizontal) + _itemWidth / 2f,
+                          -topOffset - rowIndex * (_itemHeight + _spaceVertical) - _itemHeight / 2f);
+                      rectTransform.anchoredPosition = anchoredPosition;
+                      Log.LogInfo($"anchoredPosition:{anchoredPosition} cellIndex:{cellIndex} rowIndex:{rowIndex} columnIndex:{columnIndex} dataIndex:{dataIndex}");
+                  }
+                  _itemPool.UpdateItemData(cellIndex, dataIndex);
+             } 
          }
 
          private float GetGridLeftOffset()
          {
+             // Vertical: 横向居中 + paddingLeft下限; Horizontal: 固定使用paddingLeft。
+             if (_scrollType == ScrollType.Horizontal)
+             {
+                 return _paddingLeft;
+             }
              if (_viewport == null)
              {
                  return _paddingLeft;
              }
-             float gridWidth = _columnCount * _itemWidth + (_columnCount - 1) * _spaceHorizontal;
+             int columnCountForLayout = GetLayoutColumnCount();
+             float gridWidth = columnCountForLayout * _itemWidth + Mathf.Max(0, columnCountForLayout - 1) * _spaceHorizontal;
              float centeredOffset = (_viewport.rect.width - gridWidth) * 0.5f;
              return Mathf.Max(_paddingLeft, centeredOffset);
+         }
+
+         private float GetGridTopOffset()
+         {
+             // Vertical: 固定使用paddingTop; Horizontal: 纵向居中 + paddingTop下限。
+             if (_scrollType == ScrollType.Vertical)
+             {
+                 return _paddingTop;
+             }
+             if (_viewport == null)
+             {
+                 return _paddingTop;
+             }
+             int rowCountForLayout = GetLayoutRowCount();
+             float gridHeight = rowCountForLayout * _itemHeight + Mathf.Max(0, rowCountForLayout - 1) * _spaceVertical;
+             float centeredOffset = (_viewport.rect.height - gridHeight) * 0.5f;
+             return Mathf.Max(_paddingTop, centeredOffset);
+         }
+
+         private int GetLayoutColumnCount()
+         {
+             if (_scrollType == ScrollType.Vertical)
+             {
+                 return Mathf.Max(1, _columnCount);
+             }
+             int rowCount = Mathf.Max(1, _rowCount);
+             return Mathf.CeilToInt((float)_itemCount / rowCount);
+         }
+
+         private int GetLayoutRowCount()
+         {
+             if (_scrollType == ScrollType.Vertical)
+             {
+                 int columnCount = Mathf.Max(1, _columnCount);
+                 return Mathf.CeilToInt((float)_itemCount / columnCount);
+             }
+             return Mathf.Max(1, _rowCount);
          }
 
         public int GetVisibleItemCount()
@@ -274,7 +346,7 @@ namespace UIModule.Panels
             }
             else
             {
-                return _startColumnIndex * _columnCount;
+                return _startColumnIndex * _rowCount;
             }
         }
     }

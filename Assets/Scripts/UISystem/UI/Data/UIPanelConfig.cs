@@ -68,6 +68,7 @@ namespace UIModule.Data
                 Layer = UILayer.Normal,
                 IsModal = false
             });
+
         }
 
         public static void Register(UIPanelConfig config)

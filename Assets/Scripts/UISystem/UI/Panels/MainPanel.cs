@@ -19,6 +19,7 @@ namespace UIModule.Panels
             Log.LogInfo($"MainPanel OnEnter");
             _view.OnCharacterClick += OpenCharacterPanel;
             _view.OnBagClick += OpenBagPanel;
+            _view.OnBagHorizontalClick += OpenBagHorizontalPanel;
             RegisterRedDotCallback();
         }
 
@@ -27,6 +28,7 @@ namespace UIModule.Panels
             Log.LogInfo($"MainPanel OnExit");
             _view.OnCharacterClick -= OpenCharacterPanel;
             _view.OnBagClick -= OpenBagPanel;
+            _view.OnBagHorizontalClick -= OpenBagHorizontalPanel;
             UnregisterRedDotCallback();
         }
 
@@ -68,6 +70,11 @@ namespace UIModule.Panels
         private void OpenBagPanel()
         {
             UIManager.Instance.ShowPanel(UIPanelType.Bag);
+        }
+        
+        private void OpenBagHorizontalPanel()
+        {
+            UIManager.Instance.ShowPanel(UIPanelType.Bag, "Config/BagConfig", ScrollType.Horizontal, 3);
         }
     }
 }

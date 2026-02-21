@@ -1166,6 +1166,7 @@ MonoBehaviour:
   _itemHeight: 100
   _itemWidth: 100
   _columnCount: 4
+  _rowCount: 1
   _paddingTop: 50
   _paddingLeft: 50
   _spaceHorizontal: 10
