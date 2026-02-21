@@ -63,22 +63,6 @@ namespace UIModule.Panels
             }
         }
 
-          private void Start()
-          {
-              
-              // if (_viewport != null)
-              // {
-              //     UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(_viewport);
-              // }
-              // CalculateVisibleItemCount();
-              //
-              //
-              //
-              // UpdateContentHeight();
-              // InitializePool();
-              // UpdateVisibleItems();
-          }
-
           private void Update()
           {
               if (!_isInitialized)
@@ -157,6 +141,10 @@ namespace UIModule.Panels
 
         private void OnScrollValueChanged(Vector2 position)
         {
+            if (_viewport != null)
+            {
+                Log.LogInfo($"OnScrollValueChanged viewportWidth:{_viewport.rect.width}");
+            }
             float currentPosition = GetScrollPosition();
 
             if (Mathf.Abs(currentPosition - _lastScrollPosition) > _itemHeight / 2f)
@@ -203,9 +191,6 @@ namespace UIModule.Panels
           private void UpdateVerticalScroll(float scrollPosition)
           {
               int newStartRow = Mathf.FloorToInt(scrollPosition / (_itemHeight + _spaceVertical)) - 1;
-              
-             Log.LogInfo($"newStartRow:{newStartRow}");
-             // if (newStartRow < 0) return;
               if (!_isInitialized || newStartRow != _startRowIndex)
               {
                   _startRowIndex = newStartRow;
@@ -218,7 +203,6 @@ namespace UIModule.Panels
                           (rowIndex * _columnCount + columnIndex) >= _itemCount)
                           continue;
                       UpdateItem(i, rowIndex, columnIndex, dataIndex);
-                      Log.LogInfo($"rowIndex:{rowIndex}, columnIndex:{columnIndex}, dataIndex:{dataIndex}");
                   }
                   _isInitialized = true;
               }
@@ -255,14 +239,26 @@ namespace UIModule.Panels
                  RectTransform rectTransform = item.GetComponent<RectTransform>();
                  if (rectTransform != null)
                  {
+                     float leftOffset = GetGridLeftOffset();
                      Vector2 anchoredPosition = new Vector2(
-                         columnIndex * _itemWidth + _itemWidth / 2f + _paddingLeft + columnIndex * _spaceHorizontal,
+                         leftOffset + columnIndex * (_itemWidth + _spaceHorizontal) + _itemWidth / 2f,
                          -rowIndex * _itemHeight - _itemHeight/2f - _paddingTop - rowIndex * _spaceVertical);
                      rectTransform.anchoredPosition = anchoredPosition;
                      Log.LogInfo($"anchoredPosition:{anchoredPosition} cellIndex:{cellIndex} rowIndex:{rowIndex} columnIndex:{columnIndex} dataIndex:{dataIndex}");
                  }
                  _itemPool.UpdateItemData(cellIndex, dataIndex);
              }
+         }
+
+         private float GetGridLeftOffset()
+         {
+             if (_viewport == null)
+             {
+                 return _paddingLeft;
+             }
+             float gridWidth = _columnCount * _itemWidth + (_columnCount - 1) * _spaceHorizontal;
+             float centeredOffset = (_viewport.rect.width - gridWidth) * 0.5f;
+             return Mathf.Max(_paddingLeft, centeredOffset);
          }
 
         public int GetVisibleItemCount()

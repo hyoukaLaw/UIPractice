@@ -36,7 +36,7 @@ namespace UIModule.Panels
                 InfiniteScrollRect scrollRect = view.GetComponentInChildren<InfiniteScrollRect>();
                 if (scrollRect != null && bagConfig != null)
                 {
-                    scrollRect.Initialize(bagConfig.GetItems().Count, 100f, 100f, 6, ScrollType.Vertical);
+                    scrollRect.Initialize(bagConfig.GetItems().Count, 100f, 100f, 7, ScrollType.Vertical);
                 }
             }
             RegisterCallback();
