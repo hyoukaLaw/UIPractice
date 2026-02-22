@@ -1119,6 +1119,7 @@ GameObject:
   m_Component:
   - component: {fileID: 292427014976052565}
   - component: {fileID: 4642162329162036135}
+  - component: {fileID: 6054171659857106139}
   m_Layer: 5
   m_Name: InfiniteScrollRectRoot
   m_TagString: Untagged
@@ -1161,7 +1162,7 @@ MonoBehaviour:
   _scrollRect: {fileID: 7357246671306212970}
   _content: {fileID: 4016033574147519948}
   _viewport: {fileID: 5296474172931458814}
-  _itemPool: {fileID: 4774169872842797979}
+  _listAdapterBehaviour: {fileID: 6054171659857106139}
   _itemCount: 0
   _itemHeight: 100
   _itemWidth: 100
@@ -1171,6 +1172,19 @@ MonoBehaviour:
   _paddingLeft: 50
   _spaceHorizontal: 10
   _spaceVertical: 10
+--- !u!114 &6054171659857106139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7744957502956970197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1074d8e432a8de49baf6820bd3d840c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _itemPool: {fileID: 4774169872842797979}
 --- !u!1 &8034840903666846853
 GameObject:
   m_ObjectHideFlags: 0

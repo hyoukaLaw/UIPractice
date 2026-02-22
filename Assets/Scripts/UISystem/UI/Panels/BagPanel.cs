@@ -36,10 +36,10 @@ namespace UIModule.Panels
             if (view != null)
             {
                 ConfigureScrollRectDirection(view, scrollType);
-                BagItemPool pool = view.GetComponentInChildren<BagItemPool>();
-                if (pool != null)
+                var bagListAdapter = view.GetComponentInChildren<BagListAdapter>();
+                if (bagListAdapter != null)
                 {
-                    pool.Initialize(bagConfig);
+                    bagListAdapter.SetBagConfig(bagConfig);
                 }
                 InfiniteScrollRect scrollRect = view.GetComponentInChildren<InfiniteScrollRect>();
                 if (scrollRect != null && bagConfig != null)

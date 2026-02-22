@@ -1,4 +1,5 @@
 using UIModule.Core;
+using UIModule.Interfaces;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,16 +14,11 @@ namespace UIModule.Panels
          [SerializeField]
          private RectTransform _viewport;
          [SerializeField]
-         private BagItemPool _itemPool;
-         [SerializeField]
+         private MonoBehaviour _listAdapterBehaviour;
          private int _itemCount;
-         [SerializeField]
          private float _itemHeight = 100f;
-         [SerializeField]
          private float _itemWidth = 100f;
-         [SerializeField]
          private int _columnCount = 1;
-         [SerializeField]
          private int _rowCount = 1;
          [SerializeField] 
          private float _paddingTop = 50f;
@@ -42,8 +38,10 @@ namespace UIModule.Panels
          private int _startRowIndex = 0;
          private int _startColumnIndex = 0;
          private bool _isInitialized = false;
+         private bool _isRuntimeConfigured = false;
 
          private float _lastScrollPosition;
+         private IInfiniteListAdapter _listAdapter;
 
         private void Awake()
         {
@@ -63,10 +61,18 @@ namespace UIModule.Panels
             {
                 _viewport = _scrollRect.viewport;
             }
-        }
+            if (_listAdapterBehaviour != null)
+            {
+                _listAdapter = _listAdapterBehaviour as IInfiniteListAdapter;
+            }
+         }
 
           private void Update()
           {
+              if (!_isRuntimeConfigured)
+              {
+                  return;
+              }
               if (!_isInitialized)
               {
                   _lastScrollPosition = GetScrollPosition();
@@ -85,7 +91,7 @@ namespace UIModule.Panels
             }
         }
 
-         public void Initialize(int itemCount, float itemHeight, float itemWidth, int columnCount, ScrollType scrollType)
+         public void Initialize(int itemCount, float itemHeight, float itemWidth, int primaryCount, ScrollType scrollType)
          {
              _itemCount = itemCount;
              _itemHeight = itemHeight;
@@ -93,25 +99,28 @@ namespace UIModule.Panels
              _scrollType = scrollType;
              if (_scrollType == ScrollType.Vertical)
              {
-                 _columnCount = Mathf.Max(1, columnCount);
+                 _columnCount = Mathf.Max(1, primaryCount);
              }
              else
              {
-                 // Horizontal 模式使用独立行数配置，避免与 Vertical 列数语义耦合。
-                 _rowCount = Mathf.Max(1, columnCount);
+                 // Horizontal 模式下 primaryCount 表示行数。
+                 _rowCount = Mathf.Max(1, primaryCount);
              }
              _isInitialized = false;
              _startRowIndex = 0;
              _startColumnIndex = 0;
              _lastScrollPosition = 0f;
+             _isRuntimeConfigured = true;
          }
  
          private void InitializePool()
          {
-             if (_itemPool != null)
+             if (_listAdapter == null)
              {
-                 _itemPool.InitializePool(_visibleItemCount);
+                 Log.LogError("InfiniteScrollRect requires IInfiniteListAdapter but none was found.");
+                 return;
              }
+             _listAdapter.EnsurePoolSize(_visibleItemCount);
          }
 
         private void CalculateVisibleItemCount()
@@ -257,26 +266,24 @@ namespace UIModule.Panels
 
          private void UpdateItem(int cellIndex, int rowIndex, int columnIndex, int dataIndex)
          {
-             if (_itemPool == null)
+             if (!_listAdapter.TryGetOrCreateCell(cellIndex, out var adapterCellRect))
              {
                  return;
              }
-             MonoBagListItem item = _itemPool.GetOrCreate(cellIndex);
-             if (item != null)
-             {
-                  RectTransform rectTransform = item.GetComponent<RectTransform>();
-                  if (rectTransform != null)
-                  {
-                      float leftOffset = GetGridLeftOffset();
-                      float topOffset = GetGridTopOffset();
-                      Vector2 anchoredPosition = new Vector2(
-                          leftOffset + columnIndex * (_itemWidth + _spaceHorizontal) + _itemWidth / 2f,
-                          -topOffset - rowIndex * (_itemHeight + _spaceVertical) - _itemHeight / 2f);
-                      rectTransform.anchoredPosition = anchoredPosition;
-                      Log.LogInfo($"anchoredPosition:{anchoredPosition} cellIndex:{cellIndex} rowIndex:{rowIndex} columnIndex:{columnIndex} dataIndex:{dataIndex}");
-                  }
-                  _itemPool.UpdateItemData(cellIndex, dataIndex);
-             } 
+             UpdateCellRectPosition(adapterCellRect, rowIndex, columnIndex, cellIndex, dataIndex);
+             _listAdapter.BindCell(cellIndex, dataIndex);
+         }
+        
+
+         private void UpdateCellRectPosition(RectTransform rectTransform, int rowIndex, int columnIndex, int cellIndex, int dataIndex)
+         {
+             float leftOffset = GetGridLeftOffset();
+             float topOffset = GetGridTopOffset();
+             Vector2 anchoredPosition = new Vector2(
+                 leftOffset + columnIndex * (_itemWidth + _spaceHorizontal) + _itemWidth / 2f,
+                 -topOffset - rowIndex * (_itemHeight + _spaceVertical) - _itemHeight / 2f);
+             rectTransform.anchoredPosition = anchoredPosition;
+             Log.LogInfo($"anchoredPosition:{anchoredPosition} cellIndex:{cellIndex} rowIndex:{rowIndex} columnIndex:{columnIndex} dataIndex:{dataIndex}");
          }
 
          private float GetGridLeftOffset()
@@ -332,23 +339,7 @@ namespace UIModule.Panels
              }
              return Mathf.Max(1, _rowCount);
          }
-
-        public int GetVisibleItemCount()
-        {
-            return _visibleItemCount;
-        }
-
-        public int GetStartIndex()
-        {
-            if (_scrollType == ScrollType.Vertical)
-            {
-                return _startRowIndex * _columnCount;
-            }
-            else
-            {
-                return _startColumnIndex * _rowCount;
-            }
-        }
+         
     }
 
     public enum ScrollType
